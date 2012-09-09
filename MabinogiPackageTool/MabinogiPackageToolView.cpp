@@ -52,6 +52,11 @@ void CMabinogiPackageToolView::OnInitialUpdate()
 
 	// TODO: 调用 GetListCtrl() 直接访问 ListView 的列表控件，
 	//  从而可以用项填充 ListView。
+	int index = 0;
+	GetListCtrl().InsertColumn(index++, TEXT("名称"), 0, 100);
+	GetListCtrl().InsertColumn(index++, TEXT("类型"), 0, 100);
+	GetListCtrl().InsertColumn(index++, TEXT("修改日期"), 0, 100);
+	GetListCtrl().InsertColumn(index++, TEXT("大小"), 0, 100);
 }
 
 
