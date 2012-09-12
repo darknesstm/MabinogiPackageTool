@@ -60,6 +60,9 @@
     <ClInclude Include="zutil.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="mabipackage.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -111,6 +114,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="zutil.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="mabipackage.c">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
