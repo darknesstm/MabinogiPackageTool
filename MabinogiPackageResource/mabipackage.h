@@ -6,18 +6,25 @@
 extern "C" {
 #endif
 
-typedef struct pack_entry {
+typedef struct s_pack_entry {
 	char name[MAX_PATH];
 	FILETIME ft[5];
 } *PPACKENTRY;
-typedef struct pack_input_stream {
+
+typedef struct s_pack_input_stream {
 	size_t _pos;	// 当前处理的entry index
 	byte *_base;	// 当前读取的字节数组的起点
 	byte *_ptr;		// 当前读取的字节指针
 	byte *_end;		// 当前读取的字节数组的终点
-} *PPACKINPUT;
-typedef struct pack_output_stram {
 
+	FILE *_file;
+} *PPACKINPUT;
+
+typedef struct s_pack_output_stram {
+	size_t _pos;
+	byte *_base;
+	byte *_ptr;
+	byte *_buffer;
 } *PPACKOUTPUT;
 
 
