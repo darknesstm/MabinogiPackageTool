@@ -24,9 +24,6 @@
     <ClInclude Include="targetver.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="MersenneTwister.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="crc32.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -63,12 +60,12 @@
     <ClInclude Include="mabipackage.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="mt.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="MersenneTwister.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="adler32.c">
@@ -117,6 +114,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="mabipackage.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="mt.c">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

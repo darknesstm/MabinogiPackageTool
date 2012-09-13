@@ -1,6 +1,7 @@
 #include "mabipackage.h"
 
-#include <stdio.h>
+#include "mt.h"
+#include "zlib.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -8,7 +9,7 @@ extern "C" {
 
 #pragma pack(1)
 
-struct _s_pack_header
+typedef struct __s_pack_header
 {
 	char signature[8];	// 'P' 'A' 'C' 'K' 0x02 0x01 0x00 0x00
 	unsigned long d1;	// 1
@@ -17,9 +18,9 @@ struct _s_pack_header
 	FILETIME ft2;
 	char path[480];		// 'd' 'a' 't' 'a' '\' 0x00 ...
 
-};
+} _s_pack_header;
 
-struct _s_pack_list_header 
+typedef struct __s_pack_list_header 
 {
 	unsigned long sum;				// 文件总数
 	unsigned long list_header_size;	// 文件头列表大小(包括了空白区域)
@@ -27,9 +28,9 @@ struct _s_pack_list_header
 	unsigned long data_section_size;		// 数据区大小
 	char zero[16];
 
-};
+} _s_pack_list_header;
 
-struct _s_pack_item_name
+typedef struct __s_pack_item_name
 {
 	char len_or_type;
 	union
@@ -44,9 +45,9 @@ struct _s_pack_item_name
 		// 普通情况下的文件名
 		char sz_ansi_name[1];
 	};
-};
+} _s_pack_item_name;
 
-struct _s_pack_item_info
+typedef struct __s_pack_item_info
 {
 	unsigned long seed;
 	unsigned long zero;
@@ -55,35 +56,49 @@ struct _s_pack_item_info
 	unsigned long decompress_size;
 	unsigned long is_compressed;
 	FILETIME ft[5];
-};
+} _s_pack_item_info;
 
 #pragma pack()
 ///////////////////////////////////////////////////////////
-void encrypt(char * pBuffer, size_t size, size_t seed )
+void _encrypt(char * pBuffer, size_t size, size_t seed )
 {
 	// 加密
-	CMersenneTwister mt;
+	s_mersenne_twister_status mt;
+	size_t i;
 	unsigned long rseed = (seed << 7) ^ 0xA9C36DE1;
-	mt.init_genrand(rseed);
-	for (size_t i = 0; i < size;i++)
+	init_genrand(&mt, rseed);
+	for (i = 0; i < size;i++)
 	{
-		pBuffer[i] = (char)(pBuffer[i]  ^ mt.genrand_int32());
+		pBuffer[i] = (char)(pBuffer[i]  ^ genrand_int32(&mt));
 	}
 }
 
-void decrypt(char * pBuffer, size_t size, size_t seed )
+void _decrypt(char * pBuffer, size_t size, size_t seed )
 {
-	CMersenneTwister mt;
+	s_mersenne_twister_status mt;
+	size_t i;
 	unsigned long rseed = (seed << 7) ^ 0xA9C36DE1;
-	mt.init_genrand(rseed);
-	for (size_t i = 0; i < size;i++)
+	init_genrand(&mt, rseed);
+	for (i = 0; i < size;i++)
 	{
-		pBuffer[i] = (char)(pBuffer[i]  ^ mt.genrand_int32());
+		pBuffer[i] = (char)(pBuffer[i]  ^ genrand_int32(&mt));
 	}
 }
 ///////////////////////////////////////////////////////////
 PPACKINPUT pack_input(char *file_name) 
 {
+	// c语言规范，先定义内部变量
+	size_t tmp;
+	_s_pack_header header;
+	_s_pack_list_header list_header;
+	void *p_list_buffer;
+	char *p_tmp;
+	size_t i;
+	PPACKENTRY p_entry;
+	_s_pack_item_name * p_item_name;
+	size_t size;
+	_s_pack_item_info * p_info;
+
 	// 构建返回值
 	PPACKINPUT input = (PPACKINPUT) malloc(sizeof(s_pack_input_stream));
 	memset(input, 0, sizeof(s_pack_input_stream));
@@ -91,8 +106,6 @@ PPACKINPUT pack_input(char *file_name)
 	// 打开文件
 	input->_file = fopen(file_name, "rb");
 
-	size_t tmp;
-	_s_pack_header header;
 	tmp = fread(&header, sizeof(header), 1, input->_file);
 	if (tmp != sizeof(header))
 	{
@@ -109,7 +122,7 @@ PPACKINPUT pack_input(char *file_name)
 		return 0;
 	}
 
-	_s_pack_list_header list_header;
+
 	tmp = fread(&list_header, sizeof(list_header), 1, input->_file);
 	if (tmp != sizeof(list_header))
 	{
@@ -119,7 +132,7 @@ PPACKINPUT pack_input(char *file_name)
 	}
 
 	// 加载到内存
-	void *p_list_buffer = malloc(list_header.list_header_size);
+	p_list_buffer = malloc(list_header.list_header_size);
 	tmp = fread(p_list_buffer, list_header.list_header_size, 1, input->_file);
 	if (tmp != sizeof(list_header.list_header_size))
 	{
@@ -128,15 +141,15 @@ PPACKINPUT pack_input(char *file_name)
 		return 0;
 	}
 
-	char *p_tmp = (char *) p_list_buffer;
+	p_tmp = (char *) p_list_buffer;
+	input->_entry_count = list_header.sum;
 	input->_entries = (s_pack_entry *) malloc(sizeof(s_pack_entry) * list_header.sum);
-	for (size_t i = 0; i < list_header.sum; i++)
+	for (i = 0; i < list_header.sum; i++)
 	{
 		// 准备内容
-		s_pack_entry entry = input->_entries[i];
+		p_entry = &input->_entries[i];
 
-		_s_pack_item_name * p_item_name = (_s_pack_item_name *) p_tmp;
-		size_t size;
+		p_item_name = (_s_pack_item_name *) p_tmp;
 		if (p_item_name->len_or_type < 4)
 		{
 			// 第一字节小于4
@@ -156,24 +169,24 @@ PPACKINPUT pack_input(char *file_name)
 		// 下面其实存在溢出可能，但是目前应该没有这么长的目录
 		if ( p_item_name->len_or_type <= 0x04 )
 		{
-			strcpy(entry.name, p_item_name->sz_ansi_name);
+			strcpy(p_entry->name, p_item_name->sz_ansi_name);
 		}
 		else // 0x05
 		{
-			strcpy(entry.name, p_item_name->sz_ansi_name2);
+			strcpy(p_entry->name, p_item_name->sz_ansi_name2);
 		}
 
 		// 指针跨越名称定义区
 		p_tmp += size;
 
-		_s_pack_item_info * p_info = (_s_pack_item_info *) p_tmp;
+		p_info = (_s_pack_item_info *) p_tmp;
 		// 偏移是从文件头开始的
-		entry.offset = p_info->offset + sizeof(_s_pack_header) + sizeof(_s_pack_list_header) + list_header.list_header_size;
-		entry.seed = p_info->seed;
-		entry.compress_size = p_info->compress_size;
-		entry.decompress_size = p_info->decompress_size;
-		entry.is_compressed = p_info->is_compressed;
-		memcpy(entry.ft, p_info->ft, sizeof(FILETIME) * 5);
+		p_entry->offset = p_info->offset + sizeof(_s_pack_header) + sizeof(_s_pack_list_header) + list_header.list_header_size;
+		p_entry->seed = p_info->seed;
+		p_entry->compress_size = p_info->compress_size;
+		p_entry->decompress_size = p_info->decompress_size;
+		p_entry->is_compressed = p_info->is_compressed;
+		memcpy(p_entry->ft, p_info->ft, sizeof(FILETIME) * 5);
 
 		// 指针定位到下一项
 		p_tmp += sizeof(_s_pack_item_info);
@@ -184,7 +197,7 @@ PPACKINPUT pack_input(char *file_name)
 }
 PPACKOUTPUT pack_output(char *file_name) 
 {
-
+	return 0;
 }
 
 void pack_input_close(PPACKINPUT input)
@@ -205,6 +218,12 @@ void pack_input_close(PPACKINPUT input)
 			input->_entries = 0;
 		}
 
+		if (input->_buffer)
+		{
+			free(input->_buffer);
+			input->_buffer = 0;
+		}
+
 		free(input);
 	}
 }
@@ -218,13 +237,40 @@ void pack_inpu_reset(PPACKINPUT input)
 }
 PPACKENTRY pack_input_get_next_entry(PPACKINPUT input)
 {
-	input->_pos++;
-	// 将当前内容进行解密 解压
+	s_pack_entry * p_entry;
+	char *p_buffer;
+	unsigned long dest_len;
 
-	return &input->_entries[input->_pos];
+
+	input->_pos++;
+	p_entry = &input->_entries[input->_pos];
+	// 将当前内容进行解密 解压
+	// 先读内容到内存
+	p_buffer = (char *) malloc(p_entry->compress_size);
+	_decrypt(p_buffer, p_entry->compress_size, p_entry->seed);
+	
+	// 准备好缓冲区
+	if (input->_buffer)
+	{
+		free(input->_buffer);
+		input->_buffer = 0;
+	}
+	input->_buffer = (byte *)malloc(p_entry->decompress_size);
+	dest_len = p_entry->decompress_size;
+	uncompress(input->_buffer, &dest_len, (byte *)p_buffer, p_entry->compress_size);
+	input->_ptr = input->_buffer;
+
+	free(p_buffer);
+	return p_entry;
 }
-size_t pack_input_read(PPACKINPUT input, byte* buffer, size_t size);
+size_t pack_input_read(PPACKINPUT input, byte* buffer, size_t size)
 {
+	s_pack_entry * p_entry = &input->_entries[input->_pos];
+	size_t remain_size = p_entry->decompress_size + input->_buffer - input->_ptr;
+	size_t result = remain_size >= size ? size : remain_size;
+	memcpy(buffer, input->_ptr, result);
+	input->_ptr += result;
+	return result;
 }
 
 void pack_output_put_next_entry(PPACKOUTPUT output, PPACKENTRY entry)

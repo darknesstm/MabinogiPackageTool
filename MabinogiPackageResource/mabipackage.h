@@ -1,12 +1,14 @@
 #pragma once
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <Windows.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct s_pack_entry {
+typedef struct _s_pack_entry {
 	char name[MAX_PATH];
 	unsigned long seed;				// 加密种子，只有在input里的entry才有此值，output中不需要设置
 	unsigned long offset;			// 数据区偏移，只有在input里的entry才有此值，output中不需要设置
@@ -14,24 +16,25 @@ typedef struct s_pack_entry {
 	unsigned long decompress_size;	// 解压后大小，只有在input里的entry才有此值，output中不需要设置
 	unsigned long is_compressed;	// 是否进行了压缩，只有在input里的entry才有此值，output中不需要设置
 	FILETIME ft[5];
-} *PPACKENTRY;
+} s_pack_entry, *PPACKENTRY;
 
-typedef struct s_pack_input_stream {
+typedef struct _s_pack_input_stream {
 	size_t _pos;	// 当前处理的entry index
 
 	byte *_ptr;		// 当前读取的字节指针
 
 	byte *_buffer;	// 当前entry解压出来的数据
 	FILE *_file;
-	s_pack_entry *_entries;
-} *PPACKINPUT;
+	PPACKENTRY _entries;
+	size_t _entry_count;
+} s_pack_input_stream, *PPACKINPUT;
 
-typedef struct s_pack_output_stram {
+typedef struct _s_pack_output_stram {
 	size_t _pos;
 	byte *_base;
 	byte *_ptr;
 	byte *_buffer;
-} *PPACKOUTPUT;
+} s_pack_output_stram, *PPACKOUTPUT;
 
 
 PPACKINPUT pack_input(char *file_name);

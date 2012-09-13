@@ -1,11 +1,11 @@
-#include "MersenneTwister.h"
+#include "mt.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* initializes mt[N] with a seed */
-void init_genrand(s_mersenne_twister_status *p_status, unsigned long s)
+void init_genrand(PMERSENNETWISTERSTATUS p_status, unsigned long s)
 {
 	p_status->mt[0]= s & 0xffffffffUL;
 	for (p_status->mti=1; p_status->mti<N; p_status->mti++) {
@@ -21,7 +21,7 @@ void init_genrand(s_mersenne_twister_status *p_status, unsigned long s)
 }
 
 /* generates a random number on [0,0xffffffff]-interval */
-unsigned long genrand_int32(s_mersenne_twister_status *p_status)
+unsigned long genrand_int32(PMERSENNETWISTERSTATUS p_status)
 {
 	unsigned long y;
 	static unsigned long mag01[2]={0x0UL, MATRIX_A};
