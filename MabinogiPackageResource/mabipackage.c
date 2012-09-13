@@ -102,6 +102,7 @@ PPACKINPUT pack_input(char *file_name)
 	// 构建返回值
 	PPACKINPUT input = (PPACKINPUT) malloc(sizeof(s_pack_input_stream));
 	memset(input, 0, sizeof(s_pack_input_stream));
+	input->_pos = -1;
 
 	// 打开文件
 	input->_file = fopen(file_name, "rb");
@@ -195,8 +196,26 @@ PPACKINPUT pack_input(char *file_name)
 
 	return input;
 }
+
+// 每次扩容一倍
+void _grow_entry_array(PPACKOUTPUT output)
+{
+	output->_entry_malloc_size *= 2;
+	output->_entries = (PPACKENTRY) realloc(output->_entries, output->_entry_malloc_size);
+}
+
 PPACKOUTPUT pack_output(char *file_name) 
 {
+	PPACKOUTPUT output = (PPACKOUTPUT) malloc(sizeof(s_pack_output_stram));
+	memset(output, 0, sizeof(s_pack_output_stram));
+	output->_pos = -1;
+
+	// 初始化一个空间，防止经常申请内存
+	output->_entry_malloc_size = sizeof(s_pack_entry) * 100;
+	output->_entries = (PPACKENTRY) malloc(output->_entry_malloc_size);
+
+	output->_file = fopen(file_name, "wb");
+
 	return 0;
 }
 
@@ -243,6 +262,12 @@ PPACKENTRY pack_input_get_next_entry(PPACKINPUT input)
 
 
 	input->_pos++;
+	// 已经到头了
+	if (input->_pos >= input->_entry_count)
+	{
+		return 0;
+	}
+
 	p_entry = &input->_entries[input->_pos];
 	// 将当前内容进行解密 解压
 	// 先读内容到内存
@@ -265,6 +290,10 @@ PPACKENTRY pack_input_get_next_entry(PPACKINPUT input)
 }
 size_t pack_input_read(PPACKINPUT input, byte* buffer, size_t size)
 {
+	if (input->_pos < 0 || input->_pos >= input->_entry_count)
+	{
+		return EOF;
+	}
 	s_pack_entry * p_entry = &input->_entries[input->_pos];
 	size_t remain_size = p_entry->decompress_size + input->_buffer - input->_ptr;
 	size_t result = remain_size >= size ? size : remain_size;
