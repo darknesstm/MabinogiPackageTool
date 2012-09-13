@@ -203,24 +203,33 @@ PPACKINPUT pack_input(LPCTSTR file_name)
 // 每次扩容一倍
 void _grow_entry_array(PPACKOUTPUT output)
 {
-	output->_entry_malloc_size *= 2;
-	output->_entries = (PPACKENTRY) realloc(output->_entries, output->_entry_malloc_size);
+	output->_entry_malloc_count *= 2;
+	output->_entries = (PPACKENTRY) realloc(output->_entries,  sizeof(s_pack_entry) * output->_entry_malloc_count);
 }
 
 PPACKOUTPUT pack_output(LPCTSTR file_name) 
 {
+	_s_pack_header header = {0};
+	_s_pack_list_header list_header = {0};
+
 	PPACKOUTPUT output = (PPACKOUTPUT) malloc(sizeof(s_pack_output_stram));
 	memset(output, 0, sizeof(s_pack_output_stram));
 	output->_pos = -1;
 
 	// 初始化一个空间，防止经常申请内存
-	output->_entry_malloc_size = sizeof(s_pack_entry) * 100;
-	output->_entries = (PPACKENTRY) malloc(output->_entry_malloc_size);
+	output->_entry_malloc_count = 100;
+	output->_entries = (PPACKENTRY) malloc(sizeof(s_pack_entry) * output->_entry_malloc_count);
 #ifdef _UNICODE
 	output->_file = _wfopen(file_name, L"wb");
 #else
 	output->_file = fopen(file_name, "wb");
 #endif
+
+	memcpy(header.signature, "PACK\002\001\0\0", 8);
+	header.d1 = 1;
+
+	// TODO
+
 	return 0;
 }
 
@@ -316,6 +325,11 @@ size_t pack_input_read(PPACKINPUT input, byte* buffer, size_t size)
 
 void pack_output_put_next_entry(PPACKOUTPUT output, PPACKENTRY entry)
 {
+	output->_pos++;
+	if (true)
+	{
+
+	}
 }
 void pack_output_write(PPACKOUTPUT output, byte* buffer, size_t size)
 {

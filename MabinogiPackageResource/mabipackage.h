@@ -32,8 +32,9 @@ typedef struct _s_pack_input_stream {
 typedef struct _s_pack_output_stram {
 	size_t _pos;
 	FILE *_file;
+	FILE *_tmp_file;				// 压缩内容的临时文件
 	PPACKENTRY _entries;
-	size_t _entry_malloc_size; // 已经申请的大小
+	size_t _entry_malloc_count;	// 已经申请内存的个数
 	size_t _entry_count;
 } s_pack_output_stram, *PPACKOUTPUT;
 
