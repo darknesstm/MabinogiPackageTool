@@ -38,14 +38,16 @@ typedef struct _s_pack_output_stram {
 } s_pack_output_stram, *PPACKOUTPUT;
 
 
-PPACKINPUT pack_input(char *file_name);
-PPACKOUTPUT pack_output(char *file_name);
+PPACKINPUT pack_input(LPCTSTR file_name);
+PPACKOUTPUT pack_output(LPCTSTR file_name);
 
 void pack_input_close(PPACKINPUT input);
 void pack_output_close(PPACKOUTPUT output);
 
 void pack_inpu_reset(PPACKINPUT input);
-PPACKENTRY pack_input_get_next_entry(PPACKINPUT input);
+size_t pack_input_get_entry_count(PPACKINPUT input);
+PPACKENTRY pack_input_get_entry(PPACKINPUT input, size_t index);
+PPACKENTRY pack_input_read_for_entry(PPACKINPUT input, size_t index);
 size_t pack_input_read(PPACKINPUT input, byte* buffer, size_t size);
 
 void pack_output_put_next_entry(PPACKOUTPUT output, PPACKENTRY entry);

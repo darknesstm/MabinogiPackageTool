@@ -85,7 +85,7 @@ void _decrypt(char * pBuffer, size_t size, size_t seed )
 	}
 }
 ///////////////////////////////////////////////////////////
-PPACKINPUT pack_input(char *file_name) 
+PPACKINPUT pack_input(LPCTSTR file_name) 
 {
 	// c语言规范，先定义内部变量
 	size_t tmp;
@@ -105,10 +105,13 @@ PPACKINPUT pack_input(char *file_name)
 	input->_pos = -1;
 
 	// 打开文件
+#ifdef _UNICODE
+	input->_file = _wfopen(file_name, L"rb");
+#else
 	input->_file = fopen(file_name, "rb");
-
+#endif
 	tmp = fread(&header, sizeof(header), 1, input->_file);
-	if (tmp != sizeof(header))
+	if (tmp != 1)
 	{
 		fprintf(stderr, "%s(%d)-%s:%s", __FILE__, __LINE__ , __FUNCTION__, "read header error.");
 		pack_input_close(input);
@@ -125,7 +128,7 @@ PPACKINPUT pack_input(char *file_name)
 
 
 	tmp = fread(&list_header, sizeof(list_header), 1, input->_file);
-	if (tmp != sizeof(list_header))
+	if (tmp != 1)
 	{
 		fprintf(stderr, "%s(%d)-%s:%s", __FILE__, __LINE__ , __FUNCTION__, "read list header error.");
 		pack_input_close(input);
@@ -135,7 +138,7 @@ PPACKINPUT pack_input(char *file_name)
 	// 加载到内存
 	p_list_buffer = malloc(list_header.list_header_size);
 	tmp = fread(p_list_buffer, list_header.list_header_size, 1, input->_file);
-	if (tmp != sizeof(list_header.list_header_size))
+	if (tmp != 1)
 	{
 		fprintf(stderr, "%s(%d)-%s:%s", __FILE__, __LINE__ , __FUNCTION__, "read list content error.");
 		pack_input_close(input);
@@ -204,7 +207,7 @@ void _grow_entry_array(PPACKOUTPUT output)
 	output->_entries = (PPACKENTRY) realloc(output->_entries, output->_entry_malloc_size);
 }
 
-PPACKOUTPUT pack_output(char *file_name) 
+PPACKOUTPUT pack_output(LPCTSTR file_name) 
 {
 	PPACKOUTPUT output = (PPACKOUTPUT) malloc(sizeof(s_pack_output_stram));
 	memset(output, 0, sizeof(s_pack_output_stram));
@@ -213,9 +216,11 @@ PPACKOUTPUT pack_output(char *file_name)
 	// 初始化一个空间，防止经常申请内存
 	output->_entry_malloc_size = sizeof(s_pack_entry) * 100;
 	output->_entries = (PPACKENTRY) malloc(output->_entry_malloc_size);
-
+#ifdef _UNICODE
+	output->_file = _wfopen(file_name, L"wb");
+#else
 	output->_file = fopen(file_name, "wb");
-
+#endif
 	return 0;
 }
 
@@ -254,24 +259,28 @@ void pack_inpu_reset(PPACKINPUT input)
 {
 	input->_ptr = input->_buffer;
 }
-PPACKENTRY pack_input_get_next_entry(PPACKINPUT input)
+size_t pack_input_get_entry_count(PPACKINPUT input)
+{
+	return input->_entry_count;
+}
+PPACKENTRY pack_input_get_entry(PPACKINPUT input, size_t index)
+{
+	return &input->_entries[index];
+}
+PPACKENTRY pack_input_read_for_entry(PPACKINPUT input, size_t index)
 {
 	s_pack_entry * p_entry;
 	char *p_buffer;
 	unsigned long dest_len;
 
-
-	input->_pos++;
-	// 已经到头了
-	if (input->_pos >= input->_entry_count)
-	{
-		return 0;
-	}
+	input->_pos = index;
 
 	p_entry = &input->_entries[input->_pos];
 	// 将当前内容进行解密 解压
 	// 先读内容到内存
 	p_buffer = (char *) malloc(p_entry->compress_size);
+	// 从文件读取
+	fseek(input->_file, p_entry->offset, SEEK_SET);
 	_decrypt(p_buffer, p_entry->compress_size, p_entry->seed);
 	
 	// 准备好缓冲区
@@ -290,13 +299,16 @@ PPACKENTRY pack_input_get_next_entry(PPACKINPUT input)
 }
 size_t pack_input_read(PPACKINPUT input, byte* buffer, size_t size)
 {
+	s_pack_entry * p_entry;
+	size_t remain_size;
+	size_t result;
 	if (input->_pos < 0 || input->_pos >= input->_entry_count)
 	{
 		return EOF;
 	}
-	s_pack_entry * p_entry = &input->_entries[input->_pos];
-	size_t remain_size = p_entry->decompress_size + input->_buffer - input->_ptr;
-	size_t result = remain_size >= size ? size : remain_size;
+	p_entry = &input->_entries[input->_pos];
+	remain_size = p_entry->decompress_size + input->_buffer - input->_ptr;
+	result = remain_size >= size ? size : remain_size;
 	memcpy(buffer, input->_ptr, result);
 	input->_ptr += result;
 	return result;

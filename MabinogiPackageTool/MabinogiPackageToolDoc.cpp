@@ -12,6 +12,7 @@
 #include "MabinogiPackageToolDoc.h"
 
 #include <propkey.h>
+#include "../MabinogiPackageResource/mabipackage.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -61,7 +62,17 @@ void CMabinogiPackageToolDoc::Serialize(CArchive& ar)
 	}
 	else
 	{
-		// TODO: 在此添加加载代码
+		PPACKINPUT input = pack_input(ar.GetFile()->GetFilePath());
+		for (int i = 0; i < pack_input_get_entry_count(input); i++)
+		{
+			PPACKENTRY entry = pack_input_get_entry(input, i);
+
+			OutputDebugStringA(entry->name);
+			OutputDebugStringA("\n");
+		}
+		
+		pack_input_close(input);
+
 	}
 }
 
