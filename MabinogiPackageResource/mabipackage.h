@@ -29,6 +29,7 @@ typedef struct _s_pack_input_stream {
 
 typedef struct _s_pack_output_stram {
 	unsigned long _seed;
+	
 
 	size_t _pos;
 	FILE *_file;
@@ -40,7 +41,6 @@ typedef struct _s_pack_output_stram {
 
 	PPACKENTRY _entries;
 	size_t _entry_malloc_count;	// 已经申请内存的个数
-	size_t _entry_count;
 } s_pack_output_stram, *PPACKOUTPUT;
 
 

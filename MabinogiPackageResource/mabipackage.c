@@ -215,16 +215,15 @@ void _grow_entry_array(PPACKOUTPUT output)
 
 PPACKOUTPUT pack_output(LPCTSTR file_name, unsigned long version) 
 {
-	size_t i;
+	size_t i = 0;
 	TCHAR tmp_file_name[MAX_PATH] = {0};
-	PPACKOUTPUT output = (PPACKOUTPUT) malloc(sizeof(s_pack_output_stram));
-	memset(output, 0, sizeof(s_pack_output_stram));
+	PPACKOUTPUT output = (PPACKOUTPUT) calloc(sizeof(s_pack_output_stram), 1);
 	output->_pos = -1;
 	output->_seed = version;
 
 	// 初始化一个空间，防止经常申请内存
 	output->_entry_malloc_count = 100;
-	output->_entries = (PPACKENTRY) malloc(sizeof(s_pack_entry) * output->_entry_malloc_count);
+	output->_entries = (PPACKENTRY) calloc(sizeof(s_pack_entry) , output->_entry_malloc_count);
 
 #ifdef _UNICODE
 	output->_file = _wfopen(file_name, L"wb");
@@ -232,10 +231,12 @@ PPACKOUTPUT pack_output(LPCTSTR file_name, unsigned long version)
 	output->_file = fopen(file_name, "wb");
 #endif
 
+	// TODO 文件打开错误检测
+
 #ifdef _UNICODE
 	do
 	{
-		_swprintf(tmp_file_name, L"%s.tmp%d", file_name, i);
+		swprintf(tmp_file_name, MAX_PATH, L"%s.tmp%d", file_name, i);
 	} 
 	while (_waccess(tmp_file_name, 0) != 0);
 	output->_tmp_file = _wfopen(tmp_file_name, L"wb");
@@ -247,9 +248,10 @@ PPACKOUTPUT pack_output(LPCTSTR file_name, unsigned long version)
 	while (access(tmp_file_name, 0) != 0);
 	output->_tmp_file = fopen(tmp_file_name, "wb");
 #endif
-	// TODO
+	// TODO 文件打开错误检测
 
-	return 0;
+
+	return output;
 }
 
 void pack_input_close(PPACKINPUT input)
@@ -279,8 +281,123 @@ void pack_input_close(PPACKINPUT input)
 		free(input);
 	}
 }
+
+size_t _put_name_chars(const char * name, char * buffer)
+{
+	size_t result;
+	int len = strlen(name) + 1; // 结束符
+	char type;
+	DWORD put_len;
+
+	if (len <= 0x60 - 1 )
+	{
+		if (len < 0x40 - 1)
+		{
+			type = len / 0x10;
+			result = (type + 1) * 0x10;
+		}
+		else
+		{
+			type = 4;
+			result = 0x60;
+		}
+
+		buffer[0] = type;
+		strcpy(buffer + 1, name);
+
+		return result;
+	}
+	else
+	{
+		put_len = (len + 5) % 0x10;
+		if (put_len == 0)
+		{
+			put_len = len;
+		}
+		else
+		{
+			put_len = (len - put_len + 0x10);
+		}
+		buffer[0] = 5;
+		memcpy(buffer + 1, &put_len, 2);
+		strcpy(buffer + 5, name);
+
+		return put_len + 5;
+	}
+}
+
 void pack_output_close(PPACKOUTPUT output)
 {
+	// 写入文件，如果预留的空间足够大，则直接使用临时文件
+	_s_pack_header header = {0};
+	_s_pack_list_header list_header = {0};
+	_s_pack_item_info info = {0};
+	s_pack_entry *p_entry;
+	char *buffer;
+	size_t name_chars_len;
+	size_t i;
+
+	FILETIME ft;
+	SYSTEMTIME st;
+
+	memcpy(header.signature, "PACK\002\001\0\0", 8);
+	header.d1 = 1;
+	header.sum = output->_pos + 1;
+
+	GetSystemTime(&st);              // gets current time
+	SystemTimeToFileTime(&st, &ft);  // converts to file time format
+	header.ft1 = ft;
+	header.ft2 = ft;
+	strcpy(header.path, "data\\");
+
+	// 写入文件头
+	fwrite(&header, sizeof(_s_pack_header), 1, output->_file);
+
+	// 先要跳过list header，直接写入文件列表
+	fseek(output->_file, sizeof(_s_pack_header) + sizeof(_s_pack_list_header), SEEK_SET);
+	for (i = 0; i < header.sum; i++)
+	{
+		p_entry = &output->_entries[i];
+		buffer = (char *) malloc(strlen(p_entry->name) + 0x16);
+		name_chars_len = _put_name_chars(p_entry->name, buffer);
+		fwrite(buffer, name_chars_len, 1, output->_file);
+		
+		info.compress_size = p_entry->compress_size;
+		info.decompress_size = p_entry->decompress_size;
+		memcpy(info.ft, p_entry->ft, sizeof(FILETIME) * 5);
+		info.is_compressed = p_entry->is_compressed;
+		info.offset = p_entry->offset;
+		info.seed = p_entry->seed;
+
+		fwrite(&info, sizeof(_s_pack_item_info), 1, output->_file);
+		free(buffer);
+
+		list_header.list_header_size += name_chars_len;
+		list_header.data_section_size += p_entry->compress_size;
+	}
+
+	// 写入 list header
+	list_header.sum = header.sum;
+
+	fseek(output->_file, sizeof(_s_pack_header), SEEK_SET);
+	fwrite(&list_header, sizeof(_s_pack_list_header), 1, output->_file);
+
+	// 将临时文件的内容追加进去
+	fseek(output->_file, sizeof(_s_pack_header) + sizeof(_s_pack_list_header) + list_header.list_header_size, SEEK_SET);
+	fseek(output->_tmp_file, 0, SEEK_SET);
+
+	// 准备缓存区
+	buffer = (char *) malloc(10240);
+	while (name_chars_len = fread(buffer, 10240, 1, output->_tmp_file) > 0 )
+	{
+		fwrite(buffer, name_chars_len, 1, output->_tmp_file);
+	}
+	free(buffer);
+
+	fclose(output->_file);
+	fclose(output->_tmp_file);
+
+	//remove(output->_tmp_file->);
 }
 
 void pack_inpu_reset(PPACKINPUT input)
