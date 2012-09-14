@@ -20,9 +20,7 @@ typedef struct _s_pack_entry {
 
 typedef struct _s_pack_input_stream {
 	size_t _pos;	// 当前处理的entry index
-
 	byte *_ptr;		// 当前读取的字节指针
-
 	byte *_buffer;	// 当前entry解压出来的数据
 	FILE *_file;
 	PPACKENTRY _entries;
@@ -30,9 +28,16 @@ typedef struct _s_pack_input_stream {
 } s_pack_input_stream, *PPACKINPUT;
 
 typedef struct _s_pack_output_stram {
+	unsigned long _seed;
+
 	size_t _pos;
 	FILE *_file;
 	FILE *_tmp_file;				// 压缩内容的临时文件
+
+	byte *_buffer;
+	byte *_ptr;
+	size_t _buffer_malloc_count;
+
 	PPACKENTRY _entries;
 	size_t _entry_malloc_count;	// 已经申请内存的个数
 	size_t _entry_count;
@@ -40,7 +45,7 @@ typedef struct _s_pack_output_stram {
 
 
 PPACKINPUT pack_input(LPCTSTR file_name);
-PPACKOUTPUT pack_output(LPCTSTR file_name);
+PPACKOUTPUT pack_output(LPCTSTR file_name, unsigned long version);
 
 void pack_input_close(PPACKINPUT input);
 void pack_output_close(PPACKOUTPUT output);

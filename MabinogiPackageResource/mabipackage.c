@@ -2,6 +2,7 @@
 
 #include "mt.h"
 #include "zlib.h"
+#include <io.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -100,8 +101,7 @@ PPACKINPUT pack_input(LPCTSTR file_name)
 	_s_pack_item_info * p_info;
 
 	// 构建返回值
-	PPACKINPUT input = (PPACKINPUT) malloc(sizeof(s_pack_input_stream));
-	memset(input, 0, sizeof(s_pack_input_stream));
+	PPACKINPUT input = (PPACKINPUT) calloc(sizeof(s_pack_input_stream), 1);
 	input->_pos = -1;
 
 	// 打开文件
@@ -110,6 +110,13 @@ PPACKINPUT pack_input(LPCTSTR file_name)
 #else
 	input->_file = fopen(file_name, "rb");
 #endif
+	if (input->_file == 0)
+	{
+		fprintf(stderr, "%s(%d)-%s:%s", __FILE__, __LINE__ , __FUNCTION__, "open file error.");
+		pack_input_close(input);
+		return 0;
+	}
+
 	tmp = fread(&header, sizeof(header), 1, input->_file);
 	if (tmp != 1)
 	{
@@ -125,7 +132,6 @@ PPACKINPUT pack_input(LPCTSTR file_name)
 		pack_input_close(input);
 		return 0;
 	}
-
 
 	tmp = fread(&list_header, sizeof(list_header), 1, input->_file);
 	if (tmp != 1)
@@ -207,27 +213,40 @@ void _grow_entry_array(PPACKOUTPUT output)
 	output->_entries = (PPACKENTRY) realloc(output->_entries,  sizeof(s_pack_entry) * output->_entry_malloc_count);
 }
 
-PPACKOUTPUT pack_output(LPCTSTR file_name) 
+PPACKOUTPUT pack_output(LPCTSTR file_name, unsigned long version) 
 {
-	_s_pack_header header = {0};
-	_s_pack_list_header list_header = {0};
-
+	size_t i;
+	TCHAR tmp_file_name[MAX_PATH] = {0};
 	PPACKOUTPUT output = (PPACKOUTPUT) malloc(sizeof(s_pack_output_stram));
 	memset(output, 0, sizeof(s_pack_output_stram));
 	output->_pos = -1;
+	output->_seed = version;
 
 	// 初始化一个空间，防止经常申请内存
 	output->_entry_malloc_count = 100;
 	output->_entries = (PPACKENTRY) malloc(sizeof(s_pack_entry) * output->_entry_malloc_count);
+
 #ifdef _UNICODE
 	output->_file = _wfopen(file_name, L"wb");
 #else
 	output->_file = fopen(file_name, "wb");
 #endif
 
-	memcpy(header.signature, "PACK\002\001\0\0", 8);
-	header.d1 = 1;
-
+#ifdef _UNICODE
+	do
+	{
+		_swprintf(tmp_file_name, L"%s.tmp%d", file_name, i);
+	} 
+	while (_waccess(tmp_file_name, 0) != 0);
+	output->_tmp_file = _wfopen(tmp_file_name, L"wb");
+#else
+	do
+	{
+		printf(tmp_file_name, "%s.tmp%d", file_name, i);
+	} 
+	while (access(tmp_file_name, 0) != 0);
+	output->_tmp_file = fopen(tmp_file_name, "wb");
+#endif
 	// TODO
 
 	return 0;
@@ -325,17 +344,71 @@ size_t pack_input_read(PPACKINPUT input, byte* buffer, size_t size)
 
 void pack_output_put_next_entry(PPACKOUTPUT output, PPACKENTRY entry)
 {
-	output->_pos++;
-	if (true)
+	if (output->_buffer)
 	{
-
+		pack_output_close_entry(output);
 	}
+	output->_pos++;
+	if (output->_pos > output->_entry_malloc_count)
+	{
+		// 需要增长缓冲区
+		_grow_entry_array(output);
+	}
+
+	memcpy(&output->_entries[output->_pos], entry, sizeof(s_pack_entry));
+	// 文件统一seed
+	output->_entries[output->_pos].seed = output->_seed;
+
+	// 准备好数据缓冲区
+	output->_buffer_malloc_count = 1024 * 50; // 默认50k 缓冲区
+	output->_buffer = (byte *) malloc(output->_buffer_malloc_count);
+	output->_ptr = output->_buffer;
 }
+
+void _grow_buffer(PPACKOUTPUT output) 
+{
+	output->_buffer_malloc_count *= 2;
+	output->_buffer = (byte *) realloc(output->_buffer, output->_buffer_malloc_count);
+}
+
 void pack_output_write(PPACKOUTPUT output, byte* buffer, size_t size)
 {
+	while (output->_ptr + size > output->_buffer + output->_buffer_malloc_count)
+	{
+		_grow_buffer(output);
+	}
+
+	memcpy(output->_ptr, buffer, size);
+	output->_ptr += size;
 }
 void pack_output_close_entry(PPACKOUTPUT output)
 {
+	// 缓冲区写入临时文件
+	// 先压缩后加密
+	PPACKENTRY p_entry = &output->_entries[output->_pos];
+	unsigned long src_len = output->_ptr - output->_buffer;
+	unsigned long dst_len = compressBound(src_len);
+	byte * buffer = (byte *) malloc(dst_len);
+	compress(buffer, &dst_len, output->_buffer, src_len);
+	_encrypt((char *)buffer, dst_len, p_entry->seed);
+	fwrite(buffer, dst_len, 1, output->_tmp_file);
+
+	// 将解压前后大小写入
+	p_entry->decompress_size = src_len;
+	p_entry->compress_size = dst_len;
+	p_entry->is_compressed = 1;
+	if (output->_pos == 0)
+	{
+		p_entry->offset = 0;
+	}
+	else
+	{
+		p_entry->offset = output->_entries[output->_pos - 1].offset + dst_len;
+	}
+
+	free(output->_buffer);
+	output->_buffer = 0;
+	free(buffer);
 }
 
 
