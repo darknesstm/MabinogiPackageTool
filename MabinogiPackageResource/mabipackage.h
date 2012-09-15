@@ -30,10 +30,11 @@ typedef struct _s_pack_input_stream {
 typedef struct _s_pack_output_stram {
 	unsigned long _seed;
 	
-
+	
 	size_t _pos;
 	FILE *_file;
 	FILE *_tmp_file;				// 压缩内容的临时文件
+	TCHAR _tmp_file_name[MAX_PATH];
 
 	byte *_buffer;
 	byte *_ptr;

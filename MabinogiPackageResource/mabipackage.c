@@ -8,6 +8,8 @@
 extern "C" {
 #endif
 
+#define FILE_READ_BUFFER_COUNT 10240
+
 #pragma pack(1)
 
 typedef struct __s_pack_header
@@ -216,7 +218,7 @@ void _grow_entry_array(PPACKOUTPUT output)
 PPACKOUTPUT pack_output(LPCTSTR file_name, unsigned long version) 
 {
 	size_t i = 0;
-	TCHAR tmp_file_name[MAX_PATH] = {0};
+	//TCHAR tmp_file_name[MAX_PATH] = {0};
 	PPACKOUTPUT output = (PPACKOUTPUT) calloc(sizeof(s_pack_output_stram), 1);
 	output->_pos = -1;
 	output->_seed = version;
@@ -236,17 +238,19 @@ PPACKOUTPUT pack_output(LPCTSTR file_name, unsigned long version)
 #ifdef _UNICODE
 	do
 	{
-		swprintf(tmp_file_name, MAX_PATH, L"%s.tmp%d", file_name, i);
+		swprintf(output->_tmp_file_name, MAX_PATH, L"%s.tmp%d", file_name, i);
+		i++;
 	} 
-	while (_waccess(tmp_file_name, 0) != 0);
-	output->_tmp_file = _wfopen(tmp_file_name, L"wb");
+	while (_waccess(output->_tmp_file_name, 0) == 0);
+	output->_tmp_file = _wfopen(output->_tmp_file_name, L"w+b");
 #else
 	do
 	{
-		printf(tmp_file_name, "%s.tmp%d", file_name, i);
+		printf(output->_tmp_file_name, "%s.tmp%d", file_name, i);
+		i++;
 	} 
-	while (access(tmp_file_name, 0) != 0);
-	output->_tmp_file = fopen(tmp_file_name, "wb");
+	while (access(output->_tmp_file_name, 0) == 0);
+	output->_tmp_file = fopen(output->_tmp_file_name, "w+b");
 #endif
 	// TODO 文件打开错误检测
 
@@ -387,17 +391,22 @@ void pack_output_close(PPACKOUTPUT output)
 	fseek(output->_tmp_file, 0, SEEK_SET);
 
 	// 准备缓存区
-	buffer = (char *) malloc(10240);
-	while (name_chars_len = fread(buffer, 10240, 1, output->_tmp_file) > 0 )
+	buffer = (char *) malloc(FILE_READ_BUFFER_COUNT);
+	while ((name_chars_len = fread(buffer, 1, FILE_READ_BUFFER_COUNT, output->_tmp_file)) > 0 )
 	{
-		fwrite(buffer, name_chars_len, 1, output->_tmp_file);
+		fwrite(buffer, name_chars_len, 1, output->_file);
 	}
 	free(buffer);
 
 	fclose(output->_file);
 	fclose(output->_tmp_file);
 
-	//remove(output->_tmp_file->);
+	// 删除临时文件
+#ifdef _UNICODE
+	_wremove(output->_tmp_file_name);
+#else
+	remove(output->_tmp_file_name);
+#endif
 }
 
 void pack_inpu_reset(PPACKINPUT input)
@@ -426,6 +435,7 @@ PPACKENTRY pack_input_read_for_entry(PPACKINPUT input, size_t index)
 	p_buffer = (char *) malloc(p_entry->compress_size);
 	// 从文件读取
 	fseek(input->_file, p_entry->offset, SEEK_SET);
+	fread(p_buffer, p_entry->compress_size, 1, input->_file);
 	_decrypt(p_buffer, p_entry->compress_size, p_entry->seed);
 	
 	// 准备好缓冲区
@@ -466,7 +476,7 @@ void pack_output_put_next_entry(PPACKOUTPUT output, PPACKENTRY entry)
 		pack_output_close_entry(output);
 	}
 	output->_pos++;
-	if (output->_pos > output->_entry_malloc_count)
+	if (output->_pos >= output->_entry_malloc_count)
 	{
 		// 需要增长缓冲区
 		_grow_entry_array(output);
@@ -484,8 +494,10 @@ void pack_output_put_next_entry(PPACKOUTPUT output, PPACKENTRY entry)
 
 void _grow_buffer(PPACKOUTPUT output) 
 {
+	size_t offset = output->_ptr - output->_buffer;
 	output->_buffer_malloc_count *= 2;
 	output->_buffer = (byte *) realloc(output->_buffer, output->_buffer_malloc_count);
+	output->_ptr = output->_buffer + offset;
 }
 
 void pack_output_write(PPACKOUTPUT output, byte* buffer, size_t size)
