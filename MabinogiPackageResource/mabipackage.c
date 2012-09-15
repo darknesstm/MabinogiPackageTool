@@ -401,6 +401,17 @@ void pack_output_close(PPACKOUTPUT output)
 	fclose(output->_file);
 	fclose(output->_tmp_file);
 
+	if (output->_buffer)
+	{
+		free(output->_buffer);
+		output->_buffer = 0;
+	}
+
+	if (output->_entries)
+	{
+		free(output->_entries);
+		output->_entries = 0;
+	}
 	// É¾³ýÁÙÊ±ÎÄ¼þ
 #ifdef _UNICODE
 	_wremove(output->_tmp_file_name);
