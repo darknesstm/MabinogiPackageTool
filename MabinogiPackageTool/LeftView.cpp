@@ -20,6 +20,7 @@
 IMPLEMENT_DYNCREATE(CLeftView, CTreeView)
 
 BEGIN_MESSAGE_MAP(CLeftView, CTreeView)
+	ON_NOTIFY_REFLECT(TVN_SELCHANGED, &CLeftView::OnTvnSelchanged)
 END_MESSAGE_MAP()
 
 
@@ -56,36 +57,43 @@ void CLeftView::OnInitialUpdate()
 			szCurDir, 0, &sfi, sizeof(SHFILEINFO), SHGFI_SYSICONINDEX | SHGFI_SMALLICON)), 0);
 	}
 
-    if ( !SHGetFileInfo( szCurDir,
+    if ( SHGetFileInfo( szCurDir,
                         0,
                         &ssfi,
                         sizeof( SHFILEINFO ),
                         SHGFI_ICON | 
                         SHGFI_SMALLICON ) )
     {
-        
-    }
+		m_iIconFolder = ssfi.iIcon;
 
-	m_iIconFolder = ssfi.iIcon;
+		// we only need the index from the system image list
+		DestroyIcon( ssfi.hIcon ); 
+    } 
+	else
+	{
+		m_iIconFolder = 0;
+	}
 
-    // we only need the index from the system image list
-    DestroyIcon( ssfi.hIcon );
 
-    if ( !SHGetFileInfo( szCurDir,
+
+    if ( SHGetFileInfo( szCurDir,
                         0,
                         &ssfi,
                         sizeof( SHFILEINFO ),
                         SHGFI_ICON | SHGFI_OPENICON |
                         SHGFI_SMALLICON ) )
     {
+		m_iIconFolderOpen = ssfi.iIcon;
 
-    }
+		// we only need the index of the system image list
+		DestroyIcon( ssfi.hIcon );
+    } 
+	else
+	{
+		m_iIconFolderOpen = 0;
+	}
 
-	m_iIconFolderOpen = ssfi.iIcon;
 
-    // we only need the index of the system image list
-
-    DestroyIcon( ssfi.hIcon );
 
 	shared_ptr<CPackFolder> m_spRoot = GetDocument()->GetRoot();
 	if (m_spRoot.get())
@@ -127,3 +135,13 @@ CMabinogiPackageToolDoc* CLeftView::GetDocument() // 非调试版本是内联的
 
 
 // CLeftView 消息处理程序
+
+
+void CLeftView::OnTvnSelchanged(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMTREEVIEW pNMTreeView = reinterpret_cast<LPNMTREEVIEW>(pNMHDR);
+	
+	GetDocument()->m_pSelectedFolder = (CPackFolder*)GetTreeCtrl().GetItemData(GetTreeCtrl().GetSelectedItem());
+	GetDocument()->UpdateAllViews(this);
+	*pResult = 0;
+}

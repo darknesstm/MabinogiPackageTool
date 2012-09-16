@@ -43,7 +43,8 @@ BOOL CMabinogiPackageToolView::PreCreateWindow(CREATESTRUCT& cs)
 {
 	// TODO: 在此处通过修改
 	//  CREATESTRUCT cs 来修改窗口类或样式
-
+	cs.style |= LVS_REPORT;
+	cs.dwExStyle |= LVS_EX_TRACKSELECT |LVS_EX_DOUBLEBUFFER ;
 	return CListView::PreCreateWindow(cs);
 }
 
@@ -51,9 +52,15 @@ void CMabinogiPackageToolView::OnInitialUpdate()
 {
 	CListView::OnInitialUpdate();
 
+	GetListCtrl().SetExtendedStyle(GetListCtrl().GetExtendedStyle() | LVS_EX_FULLROWSELECT);
 
-	// TODO: 调用 GetListCtrl() 直接访问 ListView 的列表控件，
-	//  从而可以用项填充 ListView。
+	GetListCtrl().InsertColumn(0, TEXT("文件名"), 0 , 100);
+	GetListCtrl().InsertColumn(1, TEXT("类型"), 0 , 100);
+	GetListCtrl().InsertColumn(2, TEXT("大小"), 0 , 100);
+	GetListCtrl().InsertColumn(3, TEXT("压缩后大小"), 0 , 100);
+	GetListCtrl().InsertColumn(4, TEXT("创建日期"), 0 , 100);
+	GetListCtrl().InsertColumn(5, TEXT("最后写入日期"), 0 , 100);
+	GetListCtrl().InsertColumn(6, TEXT("最后访问日期"), 0 , 100);
 }
 
 void CMabinogiPackageToolView::OnRButtonUp(UINT /* nFlags */, CPoint point)
@@ -96,4 +103,32 @@ void CMabinogiPackageToolView::OnStyleChanged(int nStyleType, LPSTYLESTRUCT lpSt
 {
 	//TODO: 添加代码以响应用户对窗口视图样式的更改	
 	CListView::OnStyleChanged(nStyleType,lpStyleStruct);	
+}
+
+
+void CMabinogiPackageToolView::OnUpdate(CView* pSender, LPARAM /*lHint*/, CObject* /*pHint*/)
+{
+	if (pSender != this)
+	{
+		GetListCtrl().DeleteAllItems();
+
+		CPackFolder * pFolder = GetDocument()->m_pSelectedFolder;
+		if ( pFolder != 0)
+		{
+			for (size_t i = 0;i < pFolder->m_entries.size();i++)
+			{
+				shared_ptr<CPackEntry> spFile = pFolder->m_entries.at(i);
+				int nItem = GetListCtrl().InsertItem(0, spFile->m_strName);
+
+				SHFILEINFO shFilefo;
+				SHGetFileInfo( spFile->m_strName ,FILE_ATTRIBUTE_NORMAL , &shFilefo, sizeof(shFilefo),
+					SHGFI_TYPENAME|SHGFI_USEFILEATTRIBUTES );
+
+				GetListCtrl().SetItemText(nItem, 1, shFilefo.szTypeName);
+
+				CString tmp;
+				
+			}
+		}
+	}
 }

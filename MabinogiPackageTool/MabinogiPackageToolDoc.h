@@ -88,6 +88,7 @@ public:
 protected:
 	PPACKINPUT m_pPackInput;
 	shared_ptr<CPackFolder> m_spRoot;
+
 // 生成的消息映射函数
 protected:
 	DECLARE_MESSAGE_MAP()
@@ -98,7 +99,7 @@ protected:
 #endif // SHARED_HANDLERS
 public:
 	shared_ptr<CPackFolder> GetRoot();
-
+	CPackFolder *m_pSelectedFolder;
 	virtual void DeleteContents();
 private:
 	void Parse(void);

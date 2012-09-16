@@ -162,6 +162,7 @@ void CMabinogiPackageToolDoc::DeleteContents()
 
 void CMabinogiPackageToolDoc::Parse(void)
 {
+	m_pSelectedFolder = NULL;
 	m_spRoot->Clean();
 	if (m_pPackInput)
 	{
@@ -188,7 +189,7 @@ void CMabinogiPackageToolDoc::Parse(void)
 				resToken = fullName.Tokenize(lpszTokens, pos);
 			}
 
-			//CString fileName = *paths.rbegin();
+			CString fileName = *paths.rbegin();
 			paths.pop_back();
 
 			shared_ptr<CPackFolder> spFolder = m_spRoot;
@@ -201,8 +202,11 @@ void CMabinogiPackageToolDoc::Parse(void)
 			shared_ptr<CPackEntry> entry(new CPackEntry);
 			entry->index = i;
 			entry->m_pInput = m_pPackInput;
+			entry->m_strName = fileName;
 			spFolder->m_entries.push_back(entry);
 
 		}
+
+		m_pSelectedFolder = m_spRoot.get();
 	}
 }
