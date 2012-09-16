@@ -59,7 +59,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>MabinogiPackageResource.lib</AdditionalDependencies>
+      <AdditionalDependencies>MabinogiPackageResource.lib;UxTheme.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -86,7 +86,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>MabinogiPackageResource.lib</AdditionalDependencies>
+      <AdditionalDependencies>MabinogiPackageResource.lib;UxTheme.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>

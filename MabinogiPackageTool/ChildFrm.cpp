@@ -39,8 +39,8 @@ BOOL CChildFrame::OnCreateClient(LPCREATESTRUCT /*lpcs*/, CCreateContext* pConte
 	if (!m_wndSplitter.CreateStatic(this, 1, 2))
 		return FALSE;
 
-	if (!m_wndSplitter.CreateView(0, 0, RUNTIME_CLASS(CLeftView), CSize(100, 100), pContext) ||
-		!m_wndSplitter.CreateView(0, 1, RUNTIME_CLASS(CMabinogiPackageToolView), CSize(100, 100), pContext))
+	if (!m_wndSplitter.CreateView(0, 0, RUNTIME_CLASS(CLeftView), CSize(200, 200), pContext) ||
+		!m_wndSplitter.CreateView(0, 1, RUNTIME_CLASS(CMabinogiPackageToolView), CSize(200, 200), pContext))
 	{
 		m_wndSplitter.DestroyWindow();
 		return FALSE;

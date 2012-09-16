@@ -5,8 +5,11 @@
 
 #pragma once
 
-class CMabinogiPackageToolDoc;
+#include <memory>
+using namespace std::tr1;
 
+class CPackFolder;
+class CMabinogiPackageToolDoc;
 class CLeftView : public CTreeView
 {
 protected: // 仅从序列化创建
@@ -35,7 +38,9 @@ public:
 #endif
 
 protected:
-
+	int m_iIconFolder;
+	int m_iIconFolderOpen;
+	void InsertItem( HTREEITEM hParentItem, shared_ptr<CPackFolder> spFolder );
 // 生成的消息映射函数
 protected:
 	DECLARE_MESSAGE_MAP()

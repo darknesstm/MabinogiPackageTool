@@ -126,6 +126,11 @@ BOOL CMabinogiPackageToolApp::InitInstance()
 	// 分析标准 shell 命令、DDE、打开文件操作的命令行
 	CCommandLineInfo cmdInfo;
 	ParseCommandLine(cmdInfo);
+	// 启动不需要新建一个文档
+	if (cmdInfo.m_nShellCommand == CCommandLineInfo::FileNew)
+	{
+		cmdInfo.m_nShellCommand = CCommandLineInfo::FileNothing;
+	}
 
 	// 启用“DDE 执行”
 	EnableShellOpen();

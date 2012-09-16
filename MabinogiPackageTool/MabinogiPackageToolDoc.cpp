@@ -32,6 +32,7 @@ CMabinogiPackageToolDoc::CMabinogiPackageToolDoc()
 {
 	// TODO: 在此添加一次性构造代码
 	m_pPackInput = NULL;
+	m_spRoot = shared_ptr<CPackFolder>(new CPackFolder);
 }
 
 CMabinogiPackageToolDoc::~CMabinogiPackageToolDoc()
@@ -64,6 +65,9 @@ void CMabinogiPackageToolDoc::Serialize(CArchive& ar)
 	{
 		// TODO: 在此添加加载代码
 		m_pPackInput = pack_input(ar.GetFile()->GetFilePath());
+
+		Parse();
+
 	}
 }
 
@@ -138,10 +142,9 @@ void CMabinogiPackageToolDoc::Dump(CDumpContext& dc) const
 
 // CMabinogiPackageToolDoc 命令
 
-
-PPACKINPUT CMabinogiPackageToolDoc::GetPackInput(void)
+shared_ptr<CPackFolder> CMabinogiPackageToolDoc::GetRoot()
 {
-	return m_pPackInput;
+	return m_spRoot;
 }
 
 
@@ -151,5 +154,55 @@ void CMabinogiPackageToolDoc::DeleteContents()
 	{
 		pack_input_close(m_pPackInput);
 		m_pPackInput = NULL;
+	}
+
+	m_spRoot->Clean();
+}
+
+
+void CMabinogiPackageToolDoc::Parse(void)
+{
+	m_spRoot->Clean();
+	if (m_pPackInput)
+	{
+		// TODO 从文件中读取顶层文件夹名
+		m_spRoot->m_strName = TEXT("Data");
+
+		// 解析成树状结构
+		size_t count = pack_input_get_entry_count(m_pPackInput);
+		for (size_t i = 0; i < count; i++)
+		{
+			USES_CONVERSION;
+			PPACKENTRY pEntry = pack_input_get_entry(m_pPackInput, i);
+			
+			static LPCTSTR lpszTokens = TEXT("/\\");
+			int pos = 0;
+			// 分割路径
+			vector<CString> paths;
+			CString resToken;
+			CString fullName = CA2W(pEntry->name);
+			resToken = fullName.Tokenize(lpszTokens, pos);
+			while (resToken != TEXT(""))
+			{
+				paths.push_back(resToken);
+				resToken = fullName.Tokenize(lpszTokens, pos);
+			}
+
+			//CString fileName = *paths.rbegin();
+			paths.pop_back();
+
+			shared_ptr<CPackFolder> spFolder = m_spRoot;
+			for (size_t j = 0;j < paths.size();j++)
+			{
+				CString path = paths.at(j);
+				spFolder = spFolder->FindOrCreateFolder(path);
+			}
+
+			shared_ptr<CPackEntry> entry(new CPackEntry);
+			entry->index = i;
+			entry->m_pInput = m_pPackInput;
+			spFolder->m_entries.push_back(entry);
+
+		}
 	}
 }

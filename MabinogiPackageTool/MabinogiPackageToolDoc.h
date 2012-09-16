@@ -5,7 +5,56 @@
 
 #pragma once
 
+#include <vector>
+#include <memory>
 #include "../MabinogiPackageResource/mabipackage.h"
+
+using namespace std;
+using namespace std::tr1;
+
+
+class CPackEntry
+{
+public:
+	CString m_strName;
+	size_t index;
+	PPACKINPUT m_pInput;
+};
+
+/**
+ * Tree 节点
+ */
+class CPackFolder
+{
+public:
+	void Clean()
+	{
+		m_entries.clear();
+		m_children.clear();
+	};
+
+	shared_ptr<CPackFolder> FindOrCreateFolder( LPCTSTR name )
+	{
+		for (size_t i = 0;i < m_children.size();i++)
+		{
+			if (m_children.at(i)->m_strName == name)
+			{
+				return m_children.at(i);
+			}
+		}
+
+		// 创建新的
+		shared_ptr<CPackFolder> spFolder(new CPackFolder);
+		spFolder->m_strName = name;
+		m_children.push_back(spFolder);
+		return spFolder;
+	}
+
+	CString m_strName;
+	CPackFolder *m_parent;
+	vector<shared_ptr<CPackFolder>> m_children;
+	vector<shared_ptr<CPackEntry>> m_entries;
+};
 
 class CMabinogiPackageToolDoc : public CDocument
 {
@@ -38,6 +87,7 @@ public:
 
 protected:
 	PPACKINPUT m_pPackInput;
+	shared_ptr<CPackFolder> m_spRoot;
 // 生成的消息映射函数
 protected:
 	DECLARE_MESSAGE_MAP()
@@ -47,6 +97,9 @@ protected:
 	void SetSearchContent(const CString& value);
 #endif // SHARED_HANDLERS
 public:
-	PPACKINPUT GetPackInput(void);
+	shared_ptr<CPackFolder> GetRoot();
+
 	virtual void DeleteContents();
+private:
+	void Parse(void);
 };
