@@ -36,6 +36,7 @@ protected:
 
 // 生成的消息映射函数
 protected:
+	HIMAGELIST GetShellImageList(BOOL bLarge);
 	afx_msg void OnStyleChanged(int nStyleType, LPSTYLESTRUCT lpStyleStruct);
 	afx_msg void OnFilePrintPreview();
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);

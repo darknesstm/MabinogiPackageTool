@@ -38,9 +38,10 @@ CLeftView::~CLeftView()
 BOOL CLeftView::PreCreateWindow(CREATESTRUCT& cs)
 {
 	// TODO: 在此处通过修改 CREATESTRUCT cs 来修改窗口类或样式
-	cs.style |= TVS_HASBUTTONS | LVS_SHAREIMAGELISTS | TVS_LINESATROOT;
+	cs.style |= TVS_HASBUTTONS | TVS_LINESATROOT;
 	return CTreeView::PreCreateWindow(cs);
 }
+
 
 void CLeftView::OnInitialUpdate()
 {

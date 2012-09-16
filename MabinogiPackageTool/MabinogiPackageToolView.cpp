@@ -43,14 +43,40 @@ BOOL CMabinogiPackageToolView::PreCreateWindow(CREATESTRUCT& cs)
 {
 	// TODO: 在此处通过修改
 	//  CREATESTRUCT cs 来修改窗口类或样式
-	cs.style |= LVS_REPORT;
+	cs.style |= LVS_REPORT|LVS_SHAREIMAGELISTS;
 	cs.dwExStyle |= LVS_EX_TRACKSELECT |LVS_EX_DOUBLEBUFFER ;
 	return CListView::PreCreateWindow(cs);
+}
+
+HIMAGELIST CMabinogiPackageToolView::GetShellImageList(BOOL bLarge)
+{
+	TCHAR szWinDir [MAX_PATH + 1];
+	if (GetWindowsDirectory(szWinDir, MAX_PATH) == 0)
+	{
+		return NULL;
+	}
+
+	SHFILEINFO sfi;
+	HIMAGELIST hImageList = (HIMAGELIST) SHGetFileInfo(szWinDir, 0, &sfi, sizeof(SHFILEINFO), SHGFI_SYSICONINDEX |(bLarge ? 0 : SHGFI_SMALLICON));
+	return hImageList;
 }
 
 void CMabinogiPackageToolView::OnInitialUpdate()
 {
 	CListView::OnInitialUpdate();
+
+	::SetWindowTheme(GetListCtrl().GetSafeHwnd(), L"Explorer", 0);
+
+	TCHAR szCurDir [MAX_PATH + 1];
+	if (GetCurrentDirectory(MAX_PATH, szCurDir) > 0)
+	{
+		SHFILEINFO sfi;
+		GetListCtrl().SetImageList(CImageList::FromHandle((HIMAGELIST) SHGetFileInfo(
+			szCurDir, 0, &sfi, sizeof(SHFILEINFO), SHGFI_SYSICONINDEX | SHGFI_SMALLICON)), 0);
+	}
+
+	GetListCtrl().SetImageList(CImageList::FromHandle(GetShellImageList(TRUE)), LVSIL_NORMAL);
+	GetListCtrl().SetImageList(CImageList::FromHandle(GetShellImageList(FALSE)), LVSIL_SMALL);
 
 	GetListCtrl().SetExtendedStyle(GetListCtrl().GetExtendedStyle() | LVS_EX_FULLROWSELECT);
 
@@ -118,16 +144,17 @@ void CMabinogiPackageToolView::OnUpdate(CView* pSender, LPARAM /*lHint*/, CObjec
 			for (size_t i = 0;i < pFolder->m_entries.size();i++)
 			{
 				shared_ptr<CPackEntry> spFile = pFolder->m_entries.at(i);
-				int nItem = GetListCtrl().InsertItem(0, spFile->m_strName);
-
 				SHFILEINFO shFilefo;
 				SHGetFileInfo( spFile->m_strName ,FILE_ATTRIBUTE_NORMAL , &shFilefo, sizeof(shFilefo),
-					SHGFI_TYPENAME|SHGFI_USEFILEATTRIBUTES );
+					SHGFI_TYPENAME|SHGFI_USEFILEATTRIBUTES|SHGFI_LARGEICON|SHGFI_SYSICONINDEX );
 
+				DestroyIcon(shFilefo.hIcon);
+				
+				int nItem = GetListCtrl().InsertItem(0, spFile->m_strName, shFilefo.iIcon);
 				GetListCtrl().SetItemText(nItem, 1, shFilefo.szTypeName);
 
 				CString tmp;
-				
+				// 余下信息填充
 			}
 		}
 	}

@@ -4,6 +4,7 @@
 
 #pragma once
 #include "OutputWnd.h"
+#include "PreviewPane.h"
 
 class CMainFrame : public CMDIFrameWndEx
 {
@@ -34,6 +35,7 @@ protected:  // 控件条嵌入成员
 	CMFCToolBar       m_wndToolBar;
 	CMFCStatusBar     m_wndStatusBar;
 	COutputWnd        m_wndOutput;
+	CPreviewPane      m_wndPreview;
 
 // 生成的消息映射函数
 protected:

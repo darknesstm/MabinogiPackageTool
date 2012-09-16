@@ -115,6 +115,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_wndOutput.EnableDocking(CBRS_ALIGN_ANY);
 	DockPane(&m_wndOutput);
 
+	m_wndPreview.EnableDocking(CBRS_ALIGN_ANY);
+	DockPane(&m_wndPreview);
+
 
 	// 设置用于绘制所有用户界面元素的视觉管理器
 	CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerOfficeXP));
@@ -175,6 +178,13 @@ BOOL CMainFrame::CreateDockingWindows()
 		TRACE0("未能创建输出窗口\n");
 		return FALSE; // 未能创建
 	}
+
+	if (!m_wndPreview.Create(TEXT("预览"), this, CRect(0, 0, 100, 100), TRUE, ID_VIEW_PREVIEW, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBRS_RIGHT))
+	{
+		TRACE0("未能创建预览窗口\n");
+		return FALSE; // 未能创建
+	}
+
 
 	SetDockingWindowIcons(theApp.m_bHiColorIcons);
 	return TRUE;

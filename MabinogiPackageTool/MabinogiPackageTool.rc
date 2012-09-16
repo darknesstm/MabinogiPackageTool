@@ -1,11 +1,11 @@
-//Microsoft Visual C++ 生成的资源脚本。
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
 //
-// 从 TEXTINCLUDE 2 资源生成。
+// Generated from the TEXTINCLUDE 2 resource.
 //
 #ifndef APSTUDIO_INVOKED
 #include "targetver.h"
@@ -16,19 +16,25 @@
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
-#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+// 中文(简体，中国) resources
 
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+
+#ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE
+2 TEXTINCLUDE 
 BEGIN
     "#ifndef APSTUDIO_INVOKED\r\n"
     "#include ""targetver.h""\r\n"
@@ -38,7 +44,7 @@ BEGIN
     "\0"
 END
 
-3 TEXTINCLUDE
+3 TEXTINCLUDE 
 BEGIN
     "#define _AFX_NO_OLE_RESOURCES\r\n"
     "#define _AFX_NO_TRACKER_RESOURCES\r\n"
@@ -46,11 +52,11 @@ BEGIN
     "\r\n"
     "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
     "LANGUAGE 4, 2\r\n"
-    "#include ""res\\MabinogiPackageTool.rc2""  // 非 Microsoft Visual C++ 编辑的资源\r\n"
-    "#include ""l.CHS\\afxres.rc""      // 标准组件\r\n"
+    "#include ""res\\MabinogiPackageTool.rc2""  // ·? Microsoft Visual C++ ±à?-μ?×ê?′\r\n"
+    "#include ""l.CHS\\afxres.rc""      // ±ê×?×é?t\r\n"
     "#if !defined(_AFXDLL)\r\n"
-    "#include ""l.CHS\\afxprint.rc""        // 打印/打印预览资源\r\n"
-    "#include ""l.CHS\\afxribbon.rc""        // MFC 功能区和控件条资源\r\n"
+    "#include ""l.CHS\\afxprint.rc""        // ′òó?/′òó??¤àà×ê?′\r\n"
+    "#include ""l.CHS\\afxribbon.rc""        // MFC 1|?ü??oí???tì?×ê?′\r\n"
     "#endif\r\n"
     "#endif\r\n"
     "\0"
@@ -61,23 +67,19 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// 图标
+// Icon
 //
 
-// ID 值最低的图标放在最前面，以确保应用程序图标
-// 在所有系统中保持一致。
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
-LANGUAGE 4, 2
-IDR_MAINFRAME           ICON         "res\\MabinogiPackageTool.ico"
-IDR_MabinogiPackageTYPE         ICON         "res\\MabinogiPackageToolDoc.ico"
-#endif
-IDI_OUTPUT_WND          ICON         "res\\output_wnd.ico"
-IDI_OUTPUT_WND_HC       ICON         "res\\output_wnd_hc.ico"
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\MabinogiPackageTool.ico"
+IDR_MabinogiPackageTYPE ICON                    "res\\MabinogiPackageToolDoc.ico"
+IDI_OUTPUT_WND          ICON                    "res\\output_wnd.ico"
+IDI_OUTPUT_WND_HC       ICON                    "res\\output_wnd_hc.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// 位图
+// Bitmap
 //
 
 IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
@@ -85,7 +87,7 @@ IDR_MAINFRAME_256       BITMAP                  "res\\Toolbar256.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// 工具栏
+// Toolbar
 //
 
 IDR_MAINFRAME TOOLBAR 16, 15
@@ -126,51 +128,49 @@ BEGIN
     BUTTON      ID_APP_ABOUT
 END
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
-LANGUAGE 4, 2
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// 菜单
+// Menu
 //
 
 IDR_MAINFRAME MENU
 BEGIN
     POPUP "文件(&F)"
     BEGIN
-        MENUITEM "新建(&N)\tCtrl+N",                ID_FILE_NEW
-        MENUITEM "打开(&O)...\tCtrl+O",            ID_FILE_OPEN
+        MENUITEM "新建(&N)\tCtrl+N",              ID_FILE_NEW
+        MENUITEM "打开(&O)...\tCtrl+O",           ID_FILE_OPEN
         MENUITEM "关闭(&C)",                      ID_FILE_CLOSE
         MENUITEM SEPARATOR
-        MENUITEM "最近的文件",                 ID_FILE_MRU_FILE1,GRAYED
+        MENUITEM "最近的文件",                       ID_FILE_MRU_FILE1, GRAYED
         MENUITEM SEPARATOR
-        MENUITEM "退出(&X)",                       ID_APP_EXIT
+        MENUITEM "退出(&X)",                      ID_APP_EXIT
     END
     POPUP "视图(&V)"
     BEGIN
         POPUP "工具栏和停靠窗口(&T)"
         BEGIN
-            MENUITEM "<占位符>",           ID_VIEW_TOOLBAR
+            MENUITEM "<占位符>",                       ID_VIEW_TOOLBAR
         END
-        MENUITEM "状态栏(&S)",                 ID_VIEW_STATUS_BAR
+        MENUITEM "状态栏(&S)",                     ID_VIEW_STATUS_BAR
         MENUITEM "拆分(&P)",                      ID_WINDOW_SPLIT
         MENUITEM SEPARATOR
-        MENUITEM "大图标(&G)",                ID_VIEW_LARGEICON
-        MENUITEM "小图标(&M)",                ID_VIEW_SMALLICON
-        MENUITEM "列表(&L)",                       ID_VIEW_LIST
+        MENUITEM "大图标(&G)",                     ID_VIEW_LARGEICON
+        MENUITEM "小图标(&M)",                     ID_VIEW_SMALLICON
+        MENUITEM "列表(&L)",                      ID_VIEW_LIST
         MENUITEM "详细信息(&D)",                    ID_VIEW_DETAILS
         MENUITEM SEPARATOR
         POPUP "排列图标(&I)"
         BEGIN
-            MENUITEM "按名称(&N)",                    ID_VIEW_BYNAME
+            MENUITEM "按名称(&N)",                     ID_VIEW_BYNAME
             MENUITEM SEPARATOR
-            MENUITEM "自动排列(&A)",               ID_VIEW_AUTOARRANGE
+            MENUITEM "自动排列(&A)",                    ID_VIEW_AUTOARRANGE
         END
-        MENUITEM "对齐图标(&E)",              ID_VIEW_LINEUP
+        MENUITEM "对齐图标(&E)",                    ID_VIEW_LINEUP
     END
     POPUP "帮助(&H)"
     BEGIN
-        MENUITEM "关于 MabinogiPackageTool(&A)...",          ID_APP_ABOUT
+        MENUITEM "关于 MabinogiPackageTool(&A)...", ID_APP_ABOUT
     END
 END
 
@@ -178,66 +178,63 @@ IDR_MabinogiPackageTYPE MENU
 BEGIN
     POPUP "文件(&F)"
     BEGIN
-        MENUITEM "新建(&N)\tCtrl+N",                ID_FILE_NEW
-        MENUITEM "打开(&O)...\tCtrl+O",            ID_FILE_OPEN
+        MENUITEM "新建(&N)\tCtrl+N",              ID_FILE_NEW
+        MENUITEM "打开(&O)...\tCtrl+O",           ID_FILE_OPEN
         MENUITEM "关闭(&C)",                      ID_FILE_CLOSE
-        MENUITEM "保存(&S)\tCtrl+S",               ID_FILE_SAVE
-        MENUITEM "另存为(&A)...",                 ID_FILE_SAVE_AS
+        MENUITEM "保存(&S)\tCtrl+S",              ID_FILE_SAVE
+        MENUITEM "另存为(&A)...",                  ID_FILE_SAVE_AS
         MENUITEM SEPARATOR
-        MENUITEM "最近的文件",                 ID_FILE_MRU_FILE1,GRAYED
+        MENUITEM "最近的文件",                       ID_FILE_MRU_FILE1, GRAYED
         MENUITEM SEPARATOR
-        MENUITEM "退出(&X)",                       ID_APP_EXIT
+        MENUITEM "退出(&X)",                      ID_APP_EXIT
     END
     POPUP "编辑(&E)"
     BEGIN
-        MENUITEM "撤消(&U)\tCtrl+Z",               ID_EDIT_UNDO
+        MENUITEM "撤消(&U)\tCtrl+Z",              ID_EDIT_UNDO
         MENUITEM SEPARATOR
-        MENUITEM "剪切(&T)\tCtrl+X",                ID_EDIT_CUT
-        MENUITEM "复制(&C)\tCtrl+C",               ID_EDIT_COPY
+        MENUITEM "剪切(&T)\tCtrl+X",              ID_EDIT_CUT
+        MENUITEM "复制(&C)\tCtrl+C",              ID_EDIT_COPY
         MENUITEM "粘贴(&P)\tCtrl+V",              ID_EDIT_PASTE
     END
     POPUP "视图(&V)"
     BEGIN
         POPUP "工具栏和停靠窗口(&T)"
         BEGIN
-            MENUITEM "<占位符>",           ID_VIEW_TOOLBAR
+            MENUITEM "<占位符>",                       ID_VIEW_TOOLBAR
         END
-        MENUITEM "状态栏(&S)",                 ID_VIEW_STATUS_BAR
+        MENUITEM "状态栏(&S)",                     ID_VIEW_STATUS_BAR
         MENUITEM "拆分(&P)",                      ID_WINDOW_SPLIT
         MENUITEM SEPARATOR
-        MENUITEM "大图标(&G)",                ID_VIEW_LARGEICON
-        MENUITEM "小图标(&M)",                ID_VIEW_SMALLICON
-        MENUITEM "列表(&L)",                       ID_VIEW_LIST
+        MENUITEM "大图标(&G)",                     ID_VIEW_LARGEICON
+        MENUITEM "小图标(&M)",                     ID_VIEW_SMALLICON
+        MENUITEM "列表(&L)",                      ID_VIEW_LIST
         MENUITEM "详细信息(&D)",                    ID_VIEW_DETAILS
         MENUITEM SEPARATOR
         POPUP "排列图标(&I)"
         BEGIN
-            MENUITEM "按名称(&N)",                    ID_VIEW_BYNAME
+            MENUITEM "按名称(&N)",                     ID_VIEW_BYNAME
             MENUITEM SEPARATOR
-            MENUITEM "自动排列(&A)",               ID_VIEW_AUTOARRANGE
+            MENUITEM "自动排列(&A)",                    ID_VIEW_AUTOARRANGE
         END
-        MENUITEM "对齐图标(&E)",              ID_VIEW_LINEUP
+        MENUITEM "对齐图标(&E)",                    ID_VIEW_LINEUP
     END
     POPUP "窗口(&W)"
     BEGIN
-        MENUITEM "新建窗口(&N)",                 ID_WINDOW_NEW
+        MENUITEM "新建窗口(&N)",                    ID_WINDOW_NEW
     END
     POPUP "帮助(&H)"
     BEGIN
-        MENUITEM "关于 MabinogiPackageTool(&A)...",          ID_APP_ABOUT
+        MENUITEM "关于 MabinogiPackageTool(&A)...", ID_APP_ABOUT
     END
 END
 
-
-
-
 IDR_POPUP_EDIT MENU
 BEGIN
-	POPUP "编辑"
-	BEGIN
-		MENUITEM "剪切(&T)\tCtrl+X",            ID_EDIT_CUT
-		MENUITEM "复制(&C)\tCtrl+C",           ID_EDIT_COPY
-		MENUITEM "粘贴(&P)\tCtrl+V",          ID_EDIT_PASTE
+    POPUP "编辑"
+    BEGIN
+        MENUITEM "剪切(&T)\tCtrl+X",              ID_EDIT_CUT
+        MENUITEM "复制(&C)\tCtrl+C",              ID_EDIT_COPY
+        MENUITEM "粘贴(&P)\tCtrl+V",              ID_EDIT_PASTE
     END
 END
 
@@ -245,52 +242,51 @@ IDR_OUTPUT_POPUP MENU
 BEGIN
     POPUP "弹出项"
     BEGIN
-        MENUITEM "复制(&C)",                       ID_EDIT_COPY
+        MENUITEM "复制(&C)",                      ID_EDIT_COPY
         MENUITEM "清除(&C)",                      ID_EDIT_CLEAR
         MENUITEM SEPARATOR
-        MENUITEM "隐藏(&H)",                       ID_VIEW_OUTPUTWND
+        MENUITEM "隐藏(&H)",                      ID_VIEW_OUTPUTWND
     END
 END
 
-IDR_HELP_MENU MENU 
+IDR_HELP_MENU MENU
 BEGIN
-    MENUITEM "关于 MabinogiPackageTool(&A)...",          ID_APP_ABOUT
+    MENUITEM "关于 MabinogiPackageTool(&A)...", ID_APP_ABOUT
 END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// 加速器
+// Accelerator
 //
 
 IDR_MAINFRAME ACCELERATORS
 BEGIN
-    "N",            ID_FILE_NEW,            VIRTKEY,CONTROL
-    "O",            ID_FILE_OPEN,           VIRTKEY,CONTROL
-    "S",            ID_FILE_SAVE,           VIRTKEY,CONTROL
-	"Z",            ID_EDIT_UNDO,           VIRTKEY,CONTROL
-	"X",            ID_EDIT_CUT,            VIRTKEY,CONTROL
-	"C",            ID_EDIT_COPY,           VIRTKEY,CONTROL
-	"V",            ID_EDIT_PASTE,          VIRTKEY,CONTROL
-    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY,ALT
-    VK_DELETE,      ID_EDIT_CUT,            VIRTKEY,SHIFT
-    VK_INSERT,      ID_EDIT_COPY,           VIRTKEY,CONTROL
-    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY,SHIFT
-    VK_F6,          ID_NEXT_PANE,           VIRTKEY
-    VK_F6,          ID_PREV_PANE,           VIRTKEY,SHIFT
+    "N",            ID_FILE_NEW,            VIRTKEY, CONTROL
+    "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL
+    "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL
+    "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL
+    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL
+    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL
+    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL
+    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY, ALT
+    VK_DELETE,      ID_EDIT_CUT,            VIRTKEY, SHIFT
+    VK_INSERT,      ID_EDIT_COPY,           VIRTKEY, CONTROL
+    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT
+    VK_F6,          ID_NEXT_PANE,           VIRTKEY 
+    VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT
 END
-
-
 
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// 对话框
+// Dialog
 //
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "关于 MabinogiPackageTool"
-FONT 9, "MS Shell Dlg"
+FONT 9, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,14,14,21,20
     LTEXT           "MabinogiPackageTool，1.0 版",IDC_STATIC,42,14,114,8,SS_NOPREFIX
@@ -299,24 +295,23 @@ BEGIN
 END
 
 
-
 /////////////////////////////////////////////////////////////////////////////
 //
-// 版本
+// Version
 //
 
-VS_VERSION_INFO     VERSIONINFO
-  FILEVERSION       1,0,0,1
-  PRODUCTVERSION    1,0,0,1
- FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
- FILEFLAGS VS_FF_DEBUG
+ FILEFLAGS 0x1L
 #else
  FILEFLAGS 0x0L
 #endif
- FILEOS VOS_NT_WINDOWS32
- FILETYPE VFT_APP
- FILESUBTYPE VFT2_UNKNOWN
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
@@ -324,19 +319,20 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "TODO: <公司名>"
             VALUE "FileDescription", "MabinogiPackageTool"
-            VALUE "FileVersion",     "1.0.0.1"
-            VALUE "InternalName",    "MabinogiPackageTool.exe"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "MabinogiPackageTool.exe"
             VALUE "LegalCopyright", "TODO: (C) <公司名>。保留所有权利。"
-            VALUE "OriginalFilename","MabinogiPackageTool.exe"
+            VALUE "OriginalFilename", "MabinogiPackageTool.exe"
             VALUE "ProductName", "TODO: <产品名>"
-            VALUE "ProductVersion",  "1.0.0.1"
+            VALUE "ProductVersion", "1.0.0.1"
         END
     END
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x0804, 1200
+        VALUE "Translation", 0x804, 1200
     END
 END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -356,23 +352,25 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
-// 字符串表
+// String Table
 //
 
 STRINGTABLE
 BEGIN
-// 非 Mac 应用程序将移除额外的两个子字符串
     IDR_MAINFRAME           "MabinogiPackageTool"
-  // 带文件后缀 - 同样为 shell 文件类型
-    IDR_MabinogiPackageTYPE         "\nMabinogiPackage\nMabinogiPackage\nMabinogi Resources File (*.pack)\n.pack\nMabinogiPackageTool.Document\nMabinogiPackageTool.Document"
+    IDR_MabinogiPackageTYPE "\nMabinogiPackage\nMabinogiPackage\nMabinogi Resources File (*.pack)\n.pack\nMabinogiPackageTool.Document\nMabinogiPackageTool.Document"
+    ID_WINDOW_MANAGER       "窗口(&W)..."
 END
+
 STRINGTABLE
 BEGIN
     AFX_IDS_APP_TITLE       "MabinogiPackageTool"
     AFX_IDS_IDLEMESSAGE     "就绪"
 END
+
 STRINGTABLE
 BEGIN
     ID_INDICATOR_EXT        "EXT"
@@ -382,6 +380,7 @@ BEGIN
     ID_INDICATOR_OVR        "OVR"
     ID_INDICATOR_REC        "REC"
 END
+
 STRINGTABLE
 BEGIN
     ID_FILE_NEW             "创建新文档\n新建"
@@ -389,8 +388,16 @@ BEGIN
     ID_FILE_CLOSE           "关闭活动文档\n关闭"
     ID_FILE_SAVE            "保存活动文档\n保存"
     ID_FILE_SAVE_AS         "用新名称保存活动文档\n另存为"
+END
+
+STRINGTABLE
+BEGIN
     ID_APP_ABOUT            "显示程序信息、版本号和版权信息\n关于"
     ID_APP_EXIT             "退出应用程序；提示保存文档\n退出"
+END
+
+STRINGTABLE
+BEGIN
     ID_FILE_MRU_FILE1       "打开此文档"
     ID_FILE_MRU_FILE2       "打开此文档"
     ID_FILE_MRU_FILE3       "打开此文档"
@@ -407,14 +414,26 @@ BEGIN
     ID_FILE_MRU_FILE14      "打开此文档"
     ID_FILE_MRU_FILE15      "打开此文档"
     ID_FILE_MRU_FILE16      "打开此文档"
+END
+
+STRINGTABLE
+BEGIN
     ID_NEXT_PANE            "切换到下一个窗格\n下一窗格"
     ID_PREV_PANE            "切换回上一个窗格\n上一窗格"
+END
+
+STRINGTABLE
+BEGIN
     ID_WINDOW_NEW           "为活动文档打开另一个窗口\n新建窗口"
     ID_WINDOW_ARRANGE       "在窗口底部排列图标\n排列图标"
     ID_WINDOW_CASCADE       "以重叠方式排列窗口\n层叠窗口"
     ID_WINDOW_TILE_HORZ     "以不重叠的平铺方式排列窗口\n平铺窗口"
     ID_WINDOW_TILE_VERT     "以不重叠的平铺方式排列窗口\n平铺窗口"
     ID_WINDOW_SPLIT         "将活动窗口拆分为多个窗格\n拆分"
+END
+
+STRINGTABLE
+BEGIN
     ID_EDIT_CLEAR           "清除所选内容\n清除"
     ID_EDIT_CLEAR_ALL       "清除全部内容\n全部清除"
     ID_EDIT_COPY            "复制所选内容，将其放入剪贴板\n复制"
@@ -426,7 +445,12 @@ BEGIN
     ID_EDIT_SELECT_ALL      "选定整个文档\n全选"
     ID_EDIT_UNDO            "撤消上一操作\n撤消"
     ID_EDIT_REDO            "重做上次撤消的操作\n重做"
+END
+
+STRINGTABLE
+BEGIN
     ID_VIEW_STATUS_BAR      "显示或隐藏状态栏\n切换状态栏"
+    ID_VIEW_AUTOARRANGE     "以网格方式排列图标。"
 END
 
 STRINGTABLE
@@ -438,11 +462,14 @@ BEGIN
     AFX_IDS_SCNEXTWINDOW    "切换到下一个文档窗口"
     AFX_IDS_SCPREVWINDOW    "切换到上一个文档窗口"
     AFX_IDS_SCCLOSE         "关闭活动窗口并提示保存文档"
+END
+
+STRINGTABLE
+BEGIN
     AFX_IDS_SCRESTORE       "将窗口恢复到正常大小"
     AFX_IDS_SCTASKLIST      "激活任务列表"
     AFX_IDS_MDICHILD        "激活此窗口"
 END
-
 
 STRINGTABLE
 BEGIN
@@ -456,41 +483,53 @@ END
 
 STRINGTABLE
 BEGIN
-    ID_VIEW_AUTOARRANGE         "以网格方式排列图标。"
-END
-
-STRINGTABLE
-BEGIN
     IDS_STATUS_PANE1        "窗格 1"
     IDS_STATUS_PANE2        "窗格 2"
     IDS_TOOLBAR_STANDARD    "标准"
     IDS_TOOLBAR_CUSTOMIZE   "自定义..."
-    ID_WINDOW_MANAGER       "窗口(&W)..."
+END
+
+STRINGTABLE
+BEGIN
     IDS_OUTPUT_WND          "输出"
+END
+
+STRINGTABLE
+BEGIN
     IDS_BUILD_TAB           "生成"
     IDS_DEBUG_TAB           "调试"
     IDS_FIND_TAB            "查找"
+END
+
+STRINGTABLE
+BEGIN
     IDS_EDIT_MENU           "编辑"
 END
-#endif
+
+#endif    // 中文(简体，中国) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
 
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
-// 从 TEXTINCLUDE 3 资源生成。
+// Generated from the TEXTINCLUDE 3 resource.
 //
-
 #define _AFX_NO_OLE_RESOURCES
 #define _AFX_NO_TRACKER_RESOURCES
 #define _AFX_NO_PROPERTY_RESOURCES
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE 4, 2
-#include "res\\MabinogiPackageTool.rc2"  // 非 Microsoft Visual C++ 编辑的资源
-#include "l.CHS\\afxres.rc"      // 标准组件
+#include "res\MabinogiPackageTool.rc2"  // 非 Microsoft Visual C++ 编辑的资源
+#include "l.CHS\afxres.rc"      // 标准组件
 #if !defined(_AFXDLL)
-#include "l.CHS\\afxprint.rc"        // 打印/打印预览资源
-#include "l.CHS\\afxribbon.rc"        // MFC 功能区和控件条资源
+#include "l.CHS\afxprint.rc"        // 打印/打印预览资源
+#include "l.CHS\afxribbon.rc"        // MFC 功能区和控件条资源
 #endif
 #endif
-#endif    // 不是 APSTUDIO_INVOKED
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
