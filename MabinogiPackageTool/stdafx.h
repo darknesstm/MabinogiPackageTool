@@ -21,7 +21,6 @@
 #include <afxcview.h>
 
 
-#include <afxdisp.h>        // MFC 自动化类
 
 
 

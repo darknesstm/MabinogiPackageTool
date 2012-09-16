@@ -23,6 +23,8 @@ IMPLEMENT_DYNCREATE(CMabinogiPackageToolView, CListView)
 
 BEGIN_MESSAGE_MAP(CMabinogiPackageToolView, CListView)
 	ON_WM_STYLECHANGED()
+	ON_WM_CONTEXTMENU()
+	ON_WM_RBUTTONUP()
 END_MESSAGE_MAP()
 
 // CMabinogiPackageToolView 构造/析构
@@ -52,11 +54,19 @@ void CMabinogiPackageToolView::OnInitialUpdate()
 
 	// TODO: 调用 GetListCtrl() 直接访问 ListView 的列表控件，
 	//  从而可以用项填充 ListView。
-	int index = 0;
-	GetListCtrl().InsertColumn(index++, TEXT("名称"), 0, 100);
-	GetListCtrl().InsertColumn(index++, TEXT("类型"), 0, 100);
-	GetListCtrl().InsertColumn(index++, TEXT("修改日期"), 0, 100);
-	GetListCtrl().InsertColumn(index++, TEXT("大小"), 0, 100);
+}
+
+void CMabinogiPackageToolView::OnRButtonUp(UINT /* nFlags */, CPoint point)
+{
+	ClientToScreen(&point);
+	OnContextMenu(this, point);
+}
+
+void CMabinogiPackageToolView::OnContextMenu(CWnd* /* pWnd */, CPoint point)
+{
+#ifndef SHARED_HANDLERS
+	theApp.GetContextMenuManager()->ShowPopupMenu(IDR_POPUP_EDIT, point.x, point.y, this, TRUE);
+#endif
 }
 
 

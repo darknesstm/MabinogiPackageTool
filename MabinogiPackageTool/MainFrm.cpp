@@ -6,8 +6,6 @@
 #include "MabinogiPackageTool.h"
 
 #include "MainFrm.h"
-#include "LeftView.h"
-#include "MabinogiPackageToolView.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -15,12 +13,14 @@
 
 // CMainFrame
 
-IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
+IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 
-BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
+BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWndEx)
 	ON_WM_CREATE()
-	ON_UPDATE_COMMAND_UI_RANGE(AFX_ID_VIEW_MINIMUM, AFX_ID_VIEW_MAXIMUM, &CMainFrame::OnUpdateViewStyles)
-	ON_COMMAND_RANGE(AFX_ID_VIEW_MINIMUM, AFX_ID_VIEW_MAXIMUM, &CMainFrame::OnViewStyle)
+	ON_COMMAND(ID_WINDOW_MANAGER, &CMainFrame::OnWindowManager)
+	ON_COMMAND(ID_VIEW_CUSTOMIZE, &CMainFrame::OnViewCustomize)
+	ON_REGISTERED_MESSAGE(AFX_WM_CREATETOOLBAR, &CMainFrame::OnToolbarCreateNew)
+	ON_WM_SETTINGCHANGE()
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -44,15 +44,46 @@ CMainFrame::~CMainFrame()
 
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-	if (CFrameWnd::OnCreate(lpCreateStruct) == -1)
+	if (CMDIFrameWndEx::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
+	BOOL bNameValid;
+
+	CMDITabInfo mdiTabParams;
+	mdiTabParams.m_style = CMFCTabCtrl::STYLE_3D_ONENOTE; // 其他可用样式...
+	mdiTabParams.m_bActiveTabCloseButton = TRUE;      // 设置为 FALSE 会将关闭按钮放置在选项卡区域的右侧
+	mdiTabParams.m_bTabIcons = FALSE;    // 设置为 TRUE 将在 MDI 选项卡上启用文档图标
+	mdiTabParams.m_bAutoColor = TRUE;    // 设置为 FALSE 将禁用 MDI 选项卡的自动着色
+	mdiTabParams.m_bDocumentMenu = TRUE; // 在选项卡区域的右边缘启用文档菜单
+	EnableMDITabbedGroups(TRUE, mdiTabParams);
+
+	if (!m_wndMenuBar.Create(this))
+	{
+		TRACE0("未能创建菜单栏\n");
+		return -1;      // 未能创建
+	}
+
+	m_wndMenuBar.SetPaneStyle(m_wndMenuBar.GetPaneStyle() | CBRS_SIZE_DYNAMIC | CBRS_TOOLTIPS | CBRS_FLYBY);
+
+	// 防止菜单栏在激活时获得焦点
+	CMFCPopupMenu::SetForceMenuFocus(FALSE);
+
 	if (!m_wndToolBar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP | CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC) ||
-		!m_wndToolBar.LoadToolBar(IDR_MAINFRAME))
+		!m_wndToolBar.LoadToolBar(theApp.m_bHiColorIcons ? IDR_MAINFRAME_256 : IDR_MAINFRAME))
 	{
 		TRACE0("未能创建工具栏\n");
 		return -1;      // 未能创建
 	}
+
+	CString strToolBarName;
+	bNameValid = strToolBarName.LoadString(IDS_TOOLBAR_STANDARD);
+	ASSERT(bNameValid);
+	m_wndToolBar.SetWindowText(strToolBarName);
+
+	CString strCustomize;
+	bNameValid = strCustomize.LoadString(IDS_TOOLBAR_CUSTOMIZE);
+	ASSERT(bNameValid);
+	m_wndToolBar.EnableCustomizeButton(TRUE, ID_VIEW_CUSTOMIZE, strCustomize);
 
 	if (!m_wndStatusBar.Create(this))
 	{
@@ -61,35 +92,70 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	}
 	m_wndStatusBar.SetIndicators(indicators, sizeof(indicators)/sizeof(UINT));
 
-	// TODO: 如果不需要可停靠工具栏，则删除这三行
+	// TODO: 如果您不希望工具栏和菜单栏可停靠，请删除这五行
+	m_wndMenuBar.EnableDocking(CBRS_ALIGN_ANY);
 	m_wndToolBar.EnableDocking(CBRS_ALIGN_ANY);
 	EnableDocking(CBRS_ALIGN_ANY);
-	DockControlBar(&m_wndToolBar);
+	DockPane(&m_wndMenuBar);
+	DockPane(&m_wndToolBar);
 
+
+	// 启用 Visual Studio 2005 样式停靠窗口行为
+	CDockingManager::SetDockingMode(DT_SMART);
+	// 启用 Visual Studio 2005 样式停靠窗口自动隐藏行为
+	EnableAutoHidePanes(CBRS_ALIGN_ANY);
+
+	// 创建停靠窗口
+	if (!CreateDockingWindows())
+	{
+		TRACE0("未能创建停靠窗口\n");
+		return -1;
+	}
+
+	m_wndOutput.EnableDocking(CBRS_ALIGN_ANY);
+	DockPane(&m_wndOutput);
+
+
+	// 设置用于绘制所有用户界面元素的视觉管理器
+	CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerVS2008));
+
+	// 启用增强的窗口管理对话框
+	EnableWindowsDialog(ID_WINDOW_MANAGER, ID_WINDOW_MANAGER, TRUE);
+
+	// 启用工具栏和停靠窗口菜单替换
+	EnablePaneMenu(TRUE, ID_VIEW_CUSTOMIZE, strCustomize, ID_VIEW_TOOLBAR);
+
+	// 启用快速(按住 Alt 拖动)工具栏自定义
+	CMFCToolBar::EnableQuickCustomization();
+
+	// 启用菜单个性化(最近使用的命令)
+	// TODO: 定义您自己的基本命令，确保每个下拉菜单至少有一个基本命令。
+	CList<UINT, UINT> lstBasicCommands;
+
+	lstBasicCommands.AddTail(ID_FILE_NEW);
+	lstBasicCommands.AddTail(ID_FILE_OPEN);
+	lstBasicCommands.AddTail(ID_FILE_SAVE);
+	lstBasicCommands.AddTail(ID_FILE_PRINT);
+	lstBasicCommands.AddTail(ID_APP_EXIT);
+	lstBasicCommands.AddTail(ID_EDIT_CUT);
+	lstBasicCommands.AddTail(ID_EDIT_PASTE);
+	lstBasicCommands.AddTail(ID_EDIT_UNDO);
+	lstBasicCommands.AddTail(ID_APP_ABOUT);
+	lstBasicCommands.AddTail(ID_VIEW_STATUS_BAR);
+	lstBasicCommands.AddTail(ID_VIEW_TOOLBAR);
+
+	CMFCToolBar::SetBasicCommands(lstBasicCommands);
+
+	// 将文档名和应用程序名称在窗口标题栏上的顺序进行交换。这
+	// 将改进任务栏的可用性，因为显示的文档名带有缩略图。
+	ModifyStyle(0, FWS_PREFIXTITLE);
 
 	return 0;
 }
 
-BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT /*lpcs*/,
-	CCreateContext* pContext)
-{
-	// 创建拆分窗口
-	if (!m_wndSplitter.CreateStatic(this, 1, 2))
-		return FALSE;
-
-	if (!m_wndSplitter.CreateView(0, 0, RUNTIME_CLASS(CLeftView), CSize(100, 100), pContext) ||
-		!m_wndSplitter.CreateView(0, 1, RUNTIME_CLASS(CMabinogiPackageToolView), CSize(100, 100), pContext))
-	{
-		m_wndSplitter.DestroyWindow();
-		return FALSE;
-	}
-
-	return TRUE;
-}
-
 BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 {
-	if( !CFrameWnd::PreCreateWindow(cs) )
+	if( !CMDIFrameWndEx::PreCreateWindow(cs) )
 		return FALSE;
 	// TODO: 在此处通过修改
 	//  CREATESTRUCT cs 来修改窗口类或样式
@@ -97,134 +163,82 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	return TRUE;
 }
 
+BOOL CMainFrame::CreateDockingWindows()
+{
+	BOOL bNameValid;
+	// 创建输出窗口
+	CString strOutputWnd;
+	bNameValid = strOutputWnd.LoadString(IDS_OUTPUT_WND);
+	ASSERT(bNameValid);
+	if (!m_wndOutput.Create(strOutputWnd, this, CRect(0, 0, 100, 100), TRUE, ID_VIEW_OUTPUTWND, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBRS_BOTTOM | CBRS_FLOAT_MULTI))
+	{
+		TRACE0("未能创建输出窗口\n");
+		return FALSE; // 未能创建
+	}
+
+	SetDockingWindowIcons(theApp.m_bHiColorIcons);
+	return TRUE;
+}
+
+void CMainFrame::SetDockingWindowIcons(BOOL bHiColorIcons)
+{
+	HICON hOutputBarIcon = (HICON) ::LoadImage(::AfxGetResourceHandle(), MAKEINTRESOURCE(bHiColorIcons ? IDI_OUTPUT_WND_HC : IDI_OUTPUT_WND), IMAGE_ICON, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), 0);
+	m_wndOutput.SetIcon(hOutputBarIcon, FALSE);
+
+	UpdateMDITabbedBarsIcons();
+}
+
 // CMainFrame 诊断
 
 #ifdef _DEBUG
 void CMainFrame::AssertValid() const
 {
-	CFrameWnd::AssertValid();
+	CMDIFrameWndEx::AssertValid();
 }
 
 void CMainFrame::Dump(CDumpContext& dc) const
 {
-	CFrameWnd::Dump(dc);
+	CMDIFrameWndEx::Dump(dc);
 }
 #endif //_DEBUG
 
 
 // CMainFrame 消息处理程序
 
-CMabinogiPackageToolView* CMainFrame::GetRightPane()
+void CMainFrame::OnWindowManager()
 {
-	CWnd* pWnd = m_wndSplitter.GetPane(0, 1);
-	CMabinogiPackageToolView* pView = DYNAMIC_DOWNCAST(CMabinogiPackageToolView, pWnd);
-	return pView;
+	ShowWindowsDialog();
 }
 
-void CMainFrame::OnUpdateViewStyles(CCmdUI* pCmdUI)
+void CMainFrame::OnViewCustomize()
 {
-	if (!pCmdUI)
-		return;
+	CMFCToolBarsCustomizeDialog* pDlgCust = new CMFCToolBarsCustomizeDialog(this, TRUE /* 扫描菜单*/);
+	pDlgCust->Create();
+}
 
-	// TODO: 自定义或扩展此代码以处理“视图”菜单中的选项
-
-	CMabinogiPackageToolView* pView = GetRightPane();
-
-	// 如果右窗格尚未创建或者不是视图，
-	// 则在范围内禁用命令
-
-	if (pView == NULL)
-		pCmdUI->Enable(FALSE);
-	else
+LRESULT CMainFrame::OnToolbarCreateNew(WPARAM wp,LPARAM lp)
+{
+	LRESULT lres = CMDIFrameWndEx::OnToolbarCreateNew(wp,lp);
+	if (lres == 0)
 	{
-		DWORD dwStyle = pView->GetStyle() & LVS_TYPEMASK;
-
-		// 如果命令是 ID_VIEW_LINEUP，则只有在处于
-		// LVS_ICON 或 LVS_SMALLICON 模式时才启用命令
-
-		if (pCmdUI->m_nID == ID_VIEW_LINEUP)
-		{
-			if (dwStyle == LVS_ICON || dwStyle == LVS_SMALLICON)
-				pCmdUI->Enable();
-			else
-				pCmdUI->Enable(FALSE);
-		}
-		else
-		{
-			// 否则，使用点线来反映视图的样式
-			pCmdUI->Enable();
-			BOOL bChecked = FALSE;
-
-			switch (pCmdUI->m_nID)
-			{
-			case ID_VIEW_DETAILS:
-				bChecked = (dwStyle == LVS_REPORT);
-				break;
-
-			case ID_VIEW_SMALLICON:
-				bChecked = (dwStyle == LVS_SMALLICON);
-				break;
-
-			case ID_VIEW_LARGEICON:
-				bChecked = (dwStyle == LVS_ICON);
-				break;
-
-			case ID_VIEW_LIST:
-				bChecked = (dwStyle == LVS_LIST);
-				break;
-
-			default:
-				bChecked = FALSE;
-				break;
-			}
-
-			pCmdUI->SetRadio(bChecked ? 1 : 0);
-		}
+		return 0;
 	}
+
+	CMFCToolBar* pUserToolbar = (CMFCToolBar*)lres;
+	ASSERT_VALID(pUserToolbar);
+
+	BOOL bNameValid;
+	CString strCustomize;
+	bNameValid = strCustomize.LoadString(IDS_TOOLBAR_CUSTOMIZE);
+	ASSERT(bNameValid);
+
+	pUserToolbar->EnableCustomizeButton(TRUE, ID_VIEW_CUSTOMIZE, strCustomize);
+	return lres;
 }
 
-void CMainFrame::OnViewStyle(UINT nCommandID)
+
+void CMainFrame::OnSettingChange(UINT uFlags, LPCTSTR lpszSection)
 {
-	// TODO: 自定义或扩展此代码以处理“视图”菜单中的选项
-	CMabinogiPackageToolView* pView = GetRightPane();
-
-	// 如果右窗格已创建而且是 CMabinogiPackageToolView，
-	// 则处理菜单命令...
-	if (pView != NULL)
-	{
-		DWORD dwStyle = -1;
-
-		switch (nCommandID)
-		{
-		case ID_VIEW_LINEUP:
-			{
-				// 要求列表控件与网格对齐
-				CListCtrl& refListCtrl = pView->GetListCtrl();
-				refListCtrl.Arrange(LVA_SNAPTOGRID);
-			}
-			break;
-
-		// 其他命令更改列表控件上的样式
-		case ID_VIEW_DETAILS:
-			dwStyle = LVS_REPORT;
-			break;
-
-		case ID_VIEW_SMALLICON:
-			dwStyle = LVS_SMALLICON;
-			break;
-
-		case ID_VIEW_LARGEICON:
-			dwStyle = LVS_ICON;
-			break;
-
-		case ID_VIEW_LIST:
-			dwStyle = LVS_LIST;
-			break;
-		}
-
-		// 更改样式；窗口将自动重新绘制
-		if (dwStyle != -1)
-			pView->ModifyStyle(LVS_TYPEMASK, dwStyle);
-	}
+	CMDIFrameWndEx::OnSettingChange(uFlags, lpszSection);
+	m_wndOutput.UpdateFonts();
 }
-

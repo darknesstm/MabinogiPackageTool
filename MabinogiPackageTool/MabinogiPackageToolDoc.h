@@ -38,7 +38,6 @@ public:
 
 protected:
 	PPACKINPUT m_pPackInput;
-
 // 生成的消息映射函数
 protected:
 	DECLARE_MESSAGE_MAP()
@@ -48,6 +47,6 @@ protected:
 	void SetSearchContent(const CString& value);
 #endif // SHARED_HANDLERS
 public:
-	virtual void DeleteContents();
 	PPACKINPUT GetPackInput(void);
+	virtual void DeleteContents();
 };

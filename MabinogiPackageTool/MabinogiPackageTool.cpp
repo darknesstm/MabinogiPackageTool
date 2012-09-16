@@ -8,6 +8,7 @@
 #include "MabinogiPackageTool.h"
 #include "MainFrm.h"
 
+#include "ChildFrm.h"
 #include "MabinogiPackageToolDoc.h"
 #include "LeftView.h"
 
@@ -18,11 +19,11 @@
 
 // CMabinogiPackageToolApp
 
-BEGIN_MESSAGE_MAP(CMabinogiPackageToolApp, CWinApp)
+BEGIN_MESSAGE_MAP(CMabinogiPackageToolApp, CWinAppEx)
 	ON_COMMAND(ID_APP_ABOUT, &CMabinogiPackageToolApp::OnAppAbout)
 	// 基于文件的标准文档命令
-	ON_COMMAND(ID_FILE_NEW, &CWinApp::OnFileNew)
-	ON_COMMAND(ID_FILE_OPEN, &CWinApp::OnFileOpen)
+	ON_COMMAND(ID_FILE_NEW, &CWinAppEx::OnFileNew)
+	ON_COMMAND(ID_FILE_OPEN, &CWinAppEx::OnFileOpen)
 END_MESSAGE_MAP()
 
 
@@ -30,6 +31,8 @@ END_MESSAGE_MAP()
 
 CMabinogiPackageToolApp::CMabinogiPackageToolApp()
 {
+	m_bHiColorIcons = TRUE;
+
 	// 支持重新启动管理器
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_ALL_ASPECTS;
 #ifdef _MANAGED
@@ -66,19 +69,10 @@ BOOL CMabinogiPackageToolApp::InitInstance()
 	InitCtrls.dwICC = ICC_WIN95_CLASSES;
 	InitCommonControlsEx(&InitCtrls);
 
-	CWinApp::InitInstance();
+	CWinAppEx::InitInstance();
 
 
-	// 初始化 OLE 库
-	if (!AfxOleInit())
-	{
-		AfxMessageBox(IDP_OLE_INIT_FAILED);
-		return FALSE;
-	}
-
-	AfxEnableControlContainer();
-
-	EnableTaskbarInteraction(FALSE);
+	EnableTaskbarInteraction();
 
 	// 使用 RichEdit 控件需要  AfxInitRichEdit2()	
 	// AfxInitRichEdit2();
@@ -91,21 +85,43 @@ BOOL CMabinogiPackageToolApp::InitInstance()
 	// TODO: 应适当修改该字符串，
 	// 例如修改为公司或组织名
 	SetRegistryKey(_T("海森堡"));
-	LoadStdProfileSettings(6);  // 加载标准 INI 文件选项(包括 MRU)
+	LoadStdProfileSettings(4);  // 加载标准 INI 文件选项(包括 MRU)
 
+
+	InitContextMenuManager();
+
+	InitKeyboardManager();
+
+	InitTooltipManager();
+	CMFCToolTipInfo ttParams;
+	ttParams.m_bVislManagerTheme = TRUE;
+	theApp.GetTooltipManager()->SetTooltipParams(AFX_TOOLTIP_TYPE_ALL,
+		RUNTIME_CLASS(CMFCToolTipCtrl), &ttParams);
 
 	// 注册应用程序的文档模板。文档模板
 	// 将用作文档、框架窗口和视图之间的连接
-	CSingleDocTemplate* pDocTemplate;
-	pDocTemplate = new CSingleDocTemplate(
-		IDR_MAINFRAME,
+	CMultiDocTemplate* pDocTemplate;
+	pDocTemplate = new CMultiDocTemplate(IDR_MabinogiPackageTYPE,
 		RUNTIME_CLASS(CMabinogiPackageToolDoc),
-		RUNTIME_CLASS(CMainFrame),       // 主 SDI 框架窗口
+		RUNTIME_CLASS(CChildFrame), // 自定义 MDI 子框架
 		RUNTIME_CLASS(CLeftView));
 	if (!pDocTemplate)
 		return FALSE;
 	AddDocTemplate(pDocTemplate);
 
+	// 创建主 MDI 框架窗口
+	CMainFrame* pMainFrame = new CMainFrame;
+	if (!pMainFrame || !pMainFrame->LoadFrame(IDR_MAINFRAME))
+	{
+		delete pMainFrame;
+		return FALSE;
+	}
+	m_pMainWnd = pMainFrame;
+
+	// 仅当具有后缀时才调用 DragAcceptFiles
+	//  在 MDI 应用程序中，这应在设置 m_pMainWnd 之后立即发生
+	// 启用拖/放
+	m_pMainWnd->DragAcceptFiles();
 
 	// 分析标准 shell 命令、DDE、打开文件操作的命令行
 	CCommandLineInfo cmdInfo;
@@ -120,23 +136,17 @@ BOOL CMabinogiPackageToolApp::InitInstance()
 	// 用 /RegServer、/Register、/Unregserver 或 /Unregister 启动应用程序，则返回 FALSE。
 	if (!ProcessShellCommand(cmdInfo))
 		return FALSE;
+	// 主窗口已初始化，因此显示它并对其进行更新
+	pMainFrame->ShowWindow(m_nCmdShow);
+	pMainFrame->UpdateWindow();
 
-	// 唯一的一个窗口已初始化，因此显示它并对其进行更新
-	m_pMainWnd->ShowWindow(SW_SHOW);
-	m_pMainWnd->UpdateWindow();
-	// 仅当具有后缀时才调用 DragAcceptFiles
-	//  在 SDI 应用程序中，这应在 ProcessShellCommand 之后发生
-	// 启用拖/放
-	m_pMainWnd->DragAcceptFiles();
 	return TRUE;
 }
 
 int CMabinogiPackageToolApp::ExitInstance()
 {
 	//TODO: 处理可能已添加的附加资源
-	AfxOleTerm(FALSE);
-
-	return CWinApp::ExitInstance();
+	return CWinAppEx::ExitInstance();
 }
 
 // CMabinogiPackageToolApp 消息处理程序
@@ -177,6 +187,25 @@ void CMabinogiPackageToolApp::OnAppAbout()
 {
 	CAboutDlg aboutDlg;
 	aboutDlg.DoModal();
+}
+
+// CMabinogiPackageToolApp 自定义加载/保存方法
+
+void CMabinogiPackageToolApp::PreLoadState()
+{
+	BOOL bNameValid;
+	CString strName;
+	bNameValid = strName.LoadString(IDS_EDIT_MENU);
+	ASSERT(bNameValid);
+	GetContextMenuManager()->AddMenu(strName, IDR_POPUP_EDIT);
+}
+
+void CMabinogiPackageToolApp::LoadCustomState()
+{
+}
+
+void CMabinogiPackageToolApp::SaveCustomState()
+{
 }
 
 // CMabinogiPackageToolApp 消息处理程序

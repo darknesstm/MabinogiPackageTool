@@ -40,7 +40,7 @@ MabinogiPackageTool.reg
 
 MainFrm.h, MainFrm.cpp
     这些文件中包含框架类 CMainFrame，该类派生自
-    CFrameWnd 并控制所有 SDI 框架功能。
+    CMDIFrameWnd 并控制所有 MDI 框架功能。
 
 LeftView.h, LeftView.cpp
     这些文件中包含从 CTreeView 派生的左框架类 CLeftView。
@@ -48,6 +48,13 @@ LeftView.h, LeftView.cpp
 res\Toolbar.bmp
     此位图文件用于为工具栏创建平铺图像。
     初始工具栏和状态栏在 CMainFrame 类中构造。使用资源编辑器编辑此工具栏位图，并更新 MabinogiPackageTool.rc 中的 IDR_MAINFRAME TOOLBAR 数组以添加工具栏按钮。
+/////////////////////////////////////////////////////////////////////////////
+
+对于子框架窗口：
+
+ChildFrm.h, ChildFrm.cpp
+    这些文件定义并实现 CChildFrame 类，该类支持 MDI 应用程序中的子窗口。
+
 /////////////////////////////////////////////////////////////////////////////
 
 应用程序向导创建一种文档类型和一个视图：
@@ -59,7 +66,7 @@ MabinogiPackageToolDoc.h、MabinogiPackageToolDoc.cpp - 文档
         文件类型 ID：        MabinogiPackageTool.Document
         主框架标题：  MabinogiPackageTool
         文档类型名称：       MabinogiPackage
-        筛选器名称：         MabinogiPackageTool Files (*.pack)
+        筛选器名称：         Mabinogi Resources File (*.pack)
         文件的新短名称：MabinogiPackage
         文件类型长名称：MabinogiPackageTool.Document
 
@@ -67,15 +74,10 @@ MabinogiPackageToolView.h、MabinogiPackageToolView.cpp - 文档视图
     这些文件包含 CMabinogiPackageToolView 类。
     CMabinogiPackageToolView 对象用于查看 CMabinogiPackageToolDoc 对象。
 
+res\MabinogiPackageToolDoc.ico
+    这是一个图标文件，用作 CMabinogiPackageToolDoc 类的 MDI 子窗口的图标。此图标包括在主资源文件 MabinogiPackageTool.rc 中。
 
 
-
-/////////////////////////////////////////////////////////////////////////////
-
-其他功能：
-
-ActiveX 控件
-    该应用程序包含对使用 ActiveX 控件的支持。
 
 /////////////////////////////////////////////////////////////////////////////
 

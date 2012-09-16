@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{B57B5757-D2AA-4966-B449-B5BBA6204CA3}</ProjectGuid>
+    <ProjectGuid>{B0BEDEC9-FC58-4521-AEA3-BE3DB1401E79}</ProjectGuid>
     <RootNamespace>MabinogiPackageTool</RootNamespace>
     <Keyword>MFCProj</Keyword>
   </PropertyGroup>
@@ -103,21 +103,25 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ChildFrm.h" />
     <ClInclude Include="LeftView.h" />
     <ClInclude Include="MabinogiPackageTool.h" />
     <ClInclude Include="MabinogiPackageToolDoc.h" />
     <ClInclude Include="MabinogiPackageToolView.h" />
     <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="OutputWnd.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ChildFrm.cpp" />
     <ClCompile Include="LeftView.cpp" />
     <ClCompile Include="MabinogiPackageTool.cpp" />
     <ClCompile Include="MabinogiPackageToolDoc.cpp" />
     <ClCompile Include="MabinogiPackageToolView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="OutputWnd.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -133,7 +137,11 @@
   <ItemGroup>
     <Image Include="res\MabinogiPackageTool.ico" />
     <Image Include="res\MabinogiPackageToolDoc.ico" />
+    <Image Include="res\output_wnd.ico" />
+    <Image Include="res\output_wnd_hc.ico" />
     <Image Include="res\Toolbar.bmp" />
+    <Image Include="res\Toolbar256.bmp" />
+    <Image Include="UserImages.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
