@@ -12,7 +12,7 @@
 #include "MabinogiPackageToolDoc.h"
 
 #include <propkey.h>
-#include "../MabinogiPackageResource/mabipackage.h"
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -31,7 +31,7 @@ END_MESSAGE_MAP()
 CMabinogiPackageToolDoc::CMabinogiPackageToolDoc()
 {
 	// TODO: 在此添加一次性构造代码
-
+	m_pPackInput = NULL;
 }
 
 CMabinogiPackageToolDoc::~CMabinogiPackageToolDoc()
@@ -62,33 +62,34 @@ void CMabinogiPackageToolDoc::Serialize(CArchive& ar)
 	}
 	else
 	{
-		PPACKINPUT input = pack_input(ar.GetFile()->GetFilePath());
-		PPACKOUTPUT output = pack_output(ar.GetFile()->GetFilePath() + L".test", 111);
-		byte buffer[10240];
+		m_pPackInput = pack_input(ar.GetFile()->GetFilePath());
+		//PPACKINPUT input = pack_input(ar.GetFile()->GetFilePath());
+		//PPACKOUTPUT output = pack_output(ar.GetFile()->GetFilePath() + L".test", 111);
+		//byte buffer[10240];
 
-		size_t count = pack_input_get_entry_count(input);
-		for (int i = 0; i < count; i++)
-		{
-			PPACKENTRY entry = pack_input_get_entry(input, i);
+		//size_t count = pack_input_get_entry_count(input);
+		//for (int i = 0; i < count; i++)
+		//{
+		//	PPACKENTRY entry = pack_input_get_entry(input, i);
 
-			pack_input_read_for_entry(input, i);
-			pack_output_put_next_entry(output, entry);
+		//	pack_input_read_for_entry(input, i);
+		//	pack_output_put_next_entry(output, entry);
 
-			USES_CONVERSION;
-			TRACE(L"%d/%d %s\n", i, count, A2W( entry->name));
+		//	USES_CONVERSION;
+		//	TRACE(L"%d/%d %s\n", i, count, A2W( entry->name));
 
-			size_t size;
-			while ((size = pack_input_read(input, buffer, 10240)) >0 )
-			{
-				pack_output_write(output, buffer, size);
-			}
+		//	size_t size;
+		//	while ((size = pack_input_read(input, buffer, 10240)) >0 )
+		//	{
+		//		pack_output_write(output, buffer, size);
+		//	}
 
-			pack_output_close_entry(output);
-			
-		}
-		
-		pack_input_close(input);
-		pack_output_close(output);
+		//	pack_output_close_entry(output);
+		//	
+		//}
+		//
+		//pack_input_close(input);
+		//pack_output_close(output);
 	}
 }
 
@@ -162,3 +163,19 @@ void CMabinogiPackageToolDoc::Dump(CDumpContext& dc) const
 
 
 // CMabinogiPackageToolDoc 命令
+
+
+void CMabinogiPackageToolDoc::DeleteContents()
+{
+	if (m_pPackInput != NULL)
+	{
+		pack_input_close(m_pPackInput);
+		m_pPackInput = NULL;
+	}
+}
+
+
+PPACKINPUT CMabinogiPackageToolDoc::GetPackInput(void)
+{
+	return m_pPackInput;
+}

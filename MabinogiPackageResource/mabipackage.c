@@ -212,19 +212,21 @@ PPACKINPUT pack_input(LPCTSTR file_name)
 void _grow_entry_array(PPACKOUTPUT output)
 {
 	output->_entry_malloc_count *= 2;
+	// 这里申请的内存应该在关闭输出的时候被释放
 	output->_entries = (PPACKENTRY) realloc(output->_entries,  sizeof(s_pack_entry) * output->_entry_malloc_count);
 }
 
 PPACKOUTPUT pack_output(LPCTSTR file_name, unsigned long version) 
 {
 	size_t i = 0;
-	//TCHAR tmp_file_name[MAX_PATH] = {0};
+	// 这里申请的内存应该在关闭输出的时候被释放
 	PPACKOUTPUT output = (PPACKOUTPUT) calloc(sizeof(s_pack_output_stram), 1);
 	output->_pos = -1;
 	output->_seed = version;
 
 	// 初始化一个空间，防止经常申请内存
 	output->_entry_malloc_count = 100;
+	// 这里申请的内存应该在关闭输出的时候被释放
 	output->_entries = (PPACKENTRY) calloc(sizeof(s_pack_entry) , output->_entry_malloc_count);
 
 #ifdef _UNICODE
@@ -362,6 +364,7 @@ void pack_output_close(PPACKOUTPUT output)
 	for (i = 0; i < header.sum; i++)
 	{
 		p_entry = &output->_entries[i];
+		// 这里申请的内存在下面被释放
 		buffer = (char *) malloc(strlen(p_entry->name) + 0x16);
 		name_chars_len = _put_name_chars(p_entry->name, buffer);
 		fwrite(buffer, name_chars_len, 1, output->_file);
@@ -443,6 +446,7 @@ PPACKENTRY pack_input_read_for_entry(PPACKINPUT input, size_t index)
 	p_entry = &input->_entries[input->_pos];
 	// 将当前内容进行解密 解压
 	// 先读内容到内存
+	// 这里申请的内存在下面被释放
 	p_buffer = (char *) malloc(p_entry->compress_size);
 	// 从文件读取
 	fseek(input->_file, p_entry->offset, SEEK_SET);

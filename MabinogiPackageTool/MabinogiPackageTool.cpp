@@ -113,7 +113,7 @@ BOOL CMabinogiPackageToolApp::InitInstance()
 
 	// 启用“DDE 执行”
 	EnableShellOpen();
-	RegisterShellFileTypes(TRUE);
+	//RegisterShellFileTypes(TRUE);
 
 
 	// 调度在命令行中指定的命令。如果
