@@ -12,6 +12,8 @@
 #include "MabinogiPackageToolDoc.h"
 #include "MabinogiPackageToolView.h"
 
+#include "MainFrm.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -25,6 +27,8 @@ BEGIN_MESSAGE_MAP(CMabinogiPackageToolView, CListView)
 	ON_WM_STYLECHANGED()
 	ON_WM_CONTEXTMENU()
 	ON_WM_RBUTTONUP()
+//	ON_WM_CANCELMODE()
+ON_NOTIFY_REFLECT(LVN_ITEMCHANGED, &CMabinogiPackageToolView::OnLvnItemchanged)
 END_MESSAGE_MAP()
 
 // CMabinogiPackageToolView 构造/析构
@@ -136,6 +140,8 @@ void CMabinogiPackageToolView::OnUpdate(CView* pSender, LPARAM /*lHint*/, CObjec
 {
 	if (pSender != this)
 	{
+		GetListCtrl().LockWindowUpdate();
+
 		GetListCtrl().DeleteAllItems();
 
 		CPackFolder * pFolder = GetDocument()->m_pSelectedFolder;
@@ -152,8 +158,51 @@ void CMabinogiPackageToolView::OnUpdate(CView* pSender, LPARAM /*lHint*/, CObjec
 				GetListCtrl().SetItemText(nItem, 1, shFilefo.szTypeName);
 
 				CString tmp;
-				// 余下信息填充
+				// 原始大小
+				tmp.Format(TEXT("%d字节"), spFile->GetEntry()->decompress_size);
+				GetListCtrl().SetItemText(nItem, 2, tmp);
+				
+				// 压缩后大小
+				tmp.Format(TEXT("%d字节"), spFile->GetEntry()->compress_size);
+				GetListCtrl().SetItemText(nItem, 3, tmp);
+
+
+
+				GetListCtrl().SetItemData(nItem, (DWORD_PTR)spFile.get());
 			}
 		}
+
+		GetListCtrl().UnlockWindowUpdate();
 	}
+}
+
+
+//void CMabinogiPackageToolView::OnCancelMode()
+//{
+//	CListView::OnCancelMode();
+//
+//	// TODO: 在此处添加消息处理程序代码
+//}
+
+
+void CMabinogiPackageToolView::OnLvnItemchanged(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
+	if ( (pNMLV->uNewState & LVIS_SELECTED) == LVIS_SELECTED)
+	{
+		USES_CONVERSION;
+
+		CMainFrame *pFrame = reinterpret_cast<CMainFrame*>(theApp.GetMainWnd());
+		CPackEntry *pEntry = (CPackEntry*)GetListCtrl().GetItemData(pNMLV->iItem);
+
+		shared_ptr<vector<byte> > spData = pEntry->GetData();
+		spData->push_back(0);
+
+		CString temp =  (LPCTSTR)&*spData->begin() ;
+		//temp.Format(L"%d  %d", pNMLV->iItem, pNMLV->uNewState);
+		pFrame->GetPreviewPane().SetTextContent(temp);
+	}
+
+
+	*pResult = 0;
 }

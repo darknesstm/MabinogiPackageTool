@@ -43,6 +43,9 @@ protected:
 	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
 	DECLARE_MESSAGE_MAP()
 	virtual void OnUpdate(CView* /*pSender*/, LPARAM /*lHint*/, CObject* /*pHint*/);
+public:
+//	afx_msg void OnCancelMode();
+	afx_msg void OnLvnItemchanged(NMHDR *pNMHDR, LRESULT *pResult);
 };
 
 #ifndef _DEBUG  // MabinogiPackageToolView.cpp 中的调试版本

@@ -16,9 +16,25 @@ using namespace std::tr1;
 class CPackEntry
 {
 public:
+	shared_ptr< vector<byte> > GetData()
+	{
+		PPACKENTRY pEntry = pack_input_read_for_entry(m_pInput, m_index);
+		shared_ptr< vector<byte> > buffer(new vector<byte>(pEntry->decompress_size));
+
+		pack_input_read(m_pInput, &*buffer->begin(), buffer->size());
+
+		return buffer;
+	}
+
+	PPACKENTRY GetEntry() 
+	{
+		return pack_input_get_entry(m_pInput, m_index);
+	}
+	
 	CString m_strName;
-	size_t index;
+	size_t m_index;
 	PPACKINPUT m_pInput;
+
 };
 
 /**

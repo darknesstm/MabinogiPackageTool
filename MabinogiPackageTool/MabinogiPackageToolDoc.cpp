@@ -200,7 +200,7 @@ void CMabinogiPackageToolDoc::Parse(void)
 			}
 
 			shared_ptr<CPackEntry> entry(new CPackEntry);
-			entry->index = i;
+			entry->m_index = i;
 			entry->m_pInput = m_pPackInput;
 			entry->m_strName = fileName;
 			spFolder->m_entries.push_back(entry);

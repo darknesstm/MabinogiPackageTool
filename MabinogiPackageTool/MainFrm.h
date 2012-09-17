@@ -48,6 +48,8 @@ protected:
 
 	BOOL CreateDockingWindows();
 	void SetDockingWindowIcons(BOOL bHiColorIcons);
+public:
+	CPreviewPane& GetPreviewPane(void);
 };
 
 

@@ -248,4 +248,11 @@ void CMainFrame::OnSettingChange(UINT uFlags, LPCTSTR lpszSection)
 {
 	CMDIFrameWndEx::OnSettingChange(uFlags, lpszSection);
 	m_wndOutput.UpdateFonts();
+	m_wndPreview.UpdateFonts();
+}
+
+
+CPreviewPane& CMainFrame::GetPreviewPane(void)
+{
+	return m_wndPreview;
 }
