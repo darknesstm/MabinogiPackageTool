@@ -52,11 +52,11 @@ BEGIN
     "\r\n"
     "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
     "LANGUAGE 4, 2\r\n"
-    "#include ""res\\MabinogiPackageTool.rc2""  // ·? Microsoft Visual C++ ±à?-μ?×ê?′\r\n"
-    "#include ""l.CHS\\afxres.rc""      // ±ê×?×é?t\r\n"
+    "#include ""res\\MabinogiPackageTool.rc2""  // ?¤? Microsoft Visual C++ ?à¨¤?-|ì??á¨o???\r\n"
+    "#include ""l.CHS\\afxres.rc""      // ?à¨o?á??á¨|?t\r\n"
     "#if !defined(_AFXDLL)\r\n"
-    "#include ""l.CHS\\afxprint.rc""        // ′òó?/′òó??¤àà×ê?′\r\n"
-    "#include ""l.CHS\\afxribbon.rc""        // MFC 1|?ü??oí???tì?×ê?′\r\n"
+    "#include ""l.CHS\\afxprint.rc""        // ??¨°¨??/??¨°¨????è¨¤¨¤?á¨o???\r\n"
+    "#include ""l.CHS\\afxribbon.rc""        // MFC 1|?¨1??o¨a???t¨???á¨o???\r\n"
     "#endif\r\n"
     "#endif\r\n"
     "\0"
@@ -92,15 +92,7 @@ IDR_MAINFRAME_256       BITMAP                  "res\\Toolbar256.bmp"
 
 IDR_MAINFRAME TOOLBAR 16, 15
 BEGIN
-    BUTTON      ID_FILE_NEW
     BUTTON      ID_FILE_OPEN
-    BUTTON      ID_FILE_SAVE
-    SEPARATOR
-    BUTTON      ID_EDIT_CUT
-    BUTTON      ID_EDIT_COPY
-    BUTTON      ID_EDIT_PASTE
-    SEPARATOR
-    BUTTON      ID_FILE_PRINT
     SEPARATOR
     BUTTON      ID_VIEW_LARGEICON
     BUTTON      ID_VIEW_SMALLICON
@@ -111,15 +103,7 @@ END
 
 IDR_MAINFRAME_256 TOOLBAR 16, 15
 BEGIN
-    BUTTON      ID_FILE_NEW
     BUTTON      ID_FILE_OPEN
-    BUTTON      ID_FILE_SAVE
-    SEPARATOR
-    BUTTON      ID_EDIT_CUT
-    BUTTON      ID_EDIT_COPY
-    BUTTON      ID_EDIT_PASTE
-    SEPARATOR
-    BUTTON      ID_FILE_PRINT
     SEPARATOR
     BUTTON      ID_VIEW_LARGEICON
     BUTTON      ID_VIEW_SMALLICON
@@ -138,7 +122,6 @@ IDR_MAINFRAME MENU
 BEGIN
     POPUP "文件(&F)"
     BEGIN
-        MENUITEM "新建(&N)\tCtrl+N",              ID_FILE_NEW
         MENUITEM "打开(&O)...\tCtrl+O",           ID_FILE_OPEN
         MENUITEM "关闭(&C)",                      ID_FILE_CLOSE
         MENUITEM SEPARATOR
@@ -178,11 +161,8 @@ IDR_MabinogiPackageTYPE MENU
 BEGIN
     POPUP "文件(&F)"
     BEGIN
-        MENUITEM "新建(&N)\tCtrl+N",              ID_FILE_NEW
         MENUITEM "打开(&O)...\tCtrl+O",           ID_FILE_OPEN
         MENUITEM "关闭(&C)",                      ID_FILE_CLOSE
-        MENUITEM "保存(&S)\tCtrl+S",              ID_FILE_SAVE
-        MENUITEM "另存为(&A)...",                  ID_FILE_SAVE_AS
         MENUITEM SEPARATOR
         MENUITEM "最近的文件",                       ID_FILE_MRU_FILE1, GRAYED
         MENUITEM SEPARATOR
@@ -190,11 +170,9 @@ BEGIN
     END
     POPUP "编辑(&E)"
     BEGIN
-        MENUITEM "撤消(&U)\tCtrl+Z",              ID_EDIT_UNDO
-        MENUITEM SEPARATOR
-        MENUITEM "剪切(&T)\tCtrl+X",              ID_EDIT_CUT
-        MENUITEM "复制(&C)\tCtrl+C",              ID_EDIT_COPY
-        MENUITEM "粘贴(&P)\tCtrl+V",              ID_EDIT_PASTE
+        MENUITEM "查看",                          ID_EDIT_VIEW
+        MENUITEM "查看方式...",                     ID_EDIT_VIEW_AS
+        MENUITEM "解压到...",                      ID_EDIT_EXTRACT_TO
     END
     POPUP "视图(&V)"
     BEGIN
@@ -232,9 +210,9 @@ IDR_POPUP_EDIT MENU
 BEGIN
     POPUP "编辑"
     BEGIN
-        MENUITEM "剪切(&T)\tCtrl+X",              ID_EDIT_CUT
-        MENUITEM "复制(&C)\tCtrl+C",              ID_EDIT_COPY
-        MENUITEM "粘贴(&P)\tCtrl+V",              ID_EDIT_PASTE
+        MENUITEM "查看",                          ID_EDIT_VIEW
+        MENUITEM "查看方式...",                     ID_EDIT_VIEW_AS
+        MENUITEM "解压到...",                      ID_EDIT_EXTRACT_TO
     END
 END
 
@@ -522,11 +500,11 @@ END
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE 4, 2
-#include "res\MabinogiPackageTool.rc2"  // 非 Microsoft Visual C++ 编辑的资源
-#include "l.CHS\afxres.rc"      // 标准组件
+#include "res\MabinogiPackageTool.rc2"  // ·? Microsoft Visual C++ ±à?-μ?×ê?′
+#include "l.CHS\afxres.rc"      // ±ê×?×é?t
 #if !defined(_AFXDLL)
-#include "l.CHS\afxprint.rc"        // 打印/打印预览资源
-#include "l.CHS\afxribbon.rc"        // MFC 功能区和控件条资源
+#include "l.CHS\afxprint.rc"        // ′òó?/′òó??¤àà×ê?′
+#include "l.CHS\afxribbon.rc"        // MFC 1|?ü??oí???tì?×ê?′
 #endif
 #endif
 

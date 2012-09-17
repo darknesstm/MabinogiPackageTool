@@ -44,7 +44,7 @@ BOOL CMabinogiPackageToolView::PreCreateWindow(CREATESTRUCT& cs)
 	// TODO: 在此处通过修改
 	//  CREATESTRUCT cs 来修改窗口类或样式
 	cs.style |= LVS_REPORT|LVS_SHAREIMAGELISTS;
-	cs.dwExStyle |= LVS_EX_TRACKSELECT |LVS_EX_DOUBLEBUFFER ;
+	cs.dwExStyle |= LVS_EX_TRACKSELECT;
 	return CListView::PreCreateWindow(cs);
 }
 
@@ -78,7 +78,7 @@ void CMabinogiPackageToolView::OnInitialUpdate()
 	GetListCtrl().SetImageList(CImageList::FromHandle(GetShellImageList(TRUE)), LVSIL_NORMAL);
 	GetListCtrl().SetImageList(CImageList::FromHandle(GetShellImageList(FALSE)), LVSIL_SMALL);
 
-	GetListCtrl().SetExtendedStyle(GetListCtrl().GetExtendedStyle() | LVS_EX_FULLROWSELECT);
+	GetListCtrl().SetExtendedStyle(GetListCtrl().GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
 
 	GetListCtrl().InsertColumn(0, TEXT("文件名"), 0 , 100);
 	GetListCtrl().InsertColumn(1, TEXT("类型"), 0 , 100);
@@ -146,9 +146,7 @@ void CMabinogiPackageToolView::OnUpdate(CView* pSender, LPARAM /*lHint*/, CObjec
 				shared_ptr<CPackEntry> spFile = pFolder->m_entries.at(i);
 				SHFILEINFO shFilefo;
 				SHGetFileInfo( spFile->m_strName ,FILE_ATTRIBUTE_NORMAL , &shFilefo, sizeof(shFilefo),
-					SHGFI_TYPENAME|SHGFI_USEFILEATTRIBUTES|SHGFI_LARGEICON|SHGFI_SYSICONINDEX );
-
-				DestroyIcon(shFilefo.hIcon);
+					SHGFI_TYPENAME|SHGFI_USEFILEATTRIBUTES|SHGFI_SYSICONINDEX );
 				
 				int nItem = GetListCtrl().InsertItem(0, spFile->m_strName, shFilefo.iIcon);
 				GetListCtrl().SetItemText(nItem, 1, shFilefo.szTypeName);

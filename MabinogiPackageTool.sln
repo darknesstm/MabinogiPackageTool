@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MabinogiPackageResource", "MabinogiPackageResource\MabinogiPackageResource.vcxproj", "{73303F7F-D51A-43AF-A309-1723C797B82C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MabinogiPackageTool", "MabinogiPackageTool\MabinogiPackageTool.vcxproj", "{B0BEDEC9-FC58-4521-AEA3-BE3DB1401E79}"
+	ProjectSection(ProjectDependencies) = postProject
+		{73303F7F-D51A-43AF-A309-1723C797B82C} = {73303F7F-D51A-43AF-A309-1723C797B82C}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

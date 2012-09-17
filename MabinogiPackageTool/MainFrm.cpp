@@ -135,14 +135,11 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// TODO: 定义您自己的基本命令，确保每个下拉菜单至少有一个基本命令。
 	CList<UINT, UINT> lstBasicCommands;
 
-	lstBasicCommands.AddTail(ID_FILE_NEW);
 	lstBasicCommands.AddTail(ID_FILE_OPEN);
-	lstBasicCommands.AddTail(ID_FILE_SAVE);
-	lstBasicCommands.AddTail(ID_FILE_PRINT);
 	lstBasicCommands.AddTail(ID_APP_EXIT);
-	lstBasicCommands.AddTail(ID_EDIT_CUT);
-	lstBasicCommands.AddTail(ID_EDIT_PASTE);
-	lstBasicCommands.AddTail(ID_EDIT_UNDO);
+	lstBasicCommands.AddTail(ID_EDIT_VIEW);
+	lstBasicCommands.AddTail(ID_EDIT_VIEW_AS);
+	lstBasicCommands.AddTail(ID_EDIT_EXTRACT_TO);
 	lstBasicCommands.AddTail(ID_APP_ABOUT);
 	lstBasicCommands.AddTail(ID_VIEW_STATUS_BAR);
 	lstBasicCommands.AddTail(ID_VIEW_TOOLBAR);
@@ -179,7 +176,7 @@ BOOL CMainFrame::CreateDockingWindows()
 		return FALSE; // 未能创建
 	}
 
-	if (!m_wndPreview.Create(TEXT("预览"), this, CRect(0, 0, 100, 100), TRUE, ID_VIEW_PREVIEW, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBRS_RIGHT))
+	if (!m_wndPreview.Create(TEXT("预览"), this, CRect(0, 0, 100, 100), TRUE, ID_VIEW_PREVIEW, WS_CHILD | WS_VISIBLE | CBRS_RIGHT))
 	{
 		TRACE0("未能创建预览窗口\n");
 		return FALSE; // 未能创建
