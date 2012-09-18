@@ -51,7 +51,7 @@
     <ClInclude Include="PreviewPane.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ProgressWnd.h">
+    <ClInclude Include="ProgressDialog.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -83,7 +83,7 @@
     <ClCompile Include="PreviewPane.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ProgressWnd.cpp">
+    <ClCompile Include="ProgressDialog.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

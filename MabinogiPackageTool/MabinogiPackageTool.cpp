@@ -12,7 +12,7 @@
 #include "MabinogiPackageToolDoc.h"
 #include "LeftView.h"
 
-#include "ProgressWnd.h"
+#include "ProgressDialog.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -189,29 +189,16 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
 END_MESSAGE_MAP()
 
+
 // 用于运行对话框的应用程序命令
 void CMabinogiPackageToolApp::OnAppAbout()
 {
 	//CAboutDlg aboutDlg;
 	//aboutDlg.DoModal();
+	CProgressDialog pDlg(theApp.GetMainWnd(), 0);
+	pDlg.DoModal();
 
-	CProgressWnd wndProgress(theApp.GetMainWnd(), TEXT("Progress"));
-
-    wndProgress.GoModal();
-	wndProgress.SetRange(0, 1000);
-	wndProgress.SetText(L"This is a progress window...\n\n"
-						L"Try dragging it around, hitting Cancel or pressing ESC.");
-
-	for (int i = 0; i < 1000; i++) {
-		Sleep(100);
-		wndProgress.StepIt();
-		wndProgress.PeekAndPump();
-
-		if (wndProgress.Cancelled()) {
-			AfxMessageBox(L"Progress Cancelled");
-			break;
-		}
-	}
+	AfxMessageBox(L"OK!");
 }
 
 // CMabinogiPackageToolApp 自定义加载/保存方法
