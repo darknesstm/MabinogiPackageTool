@@ -51,10 +51,7 @@
     <ClInclude Include="PreviewPane.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="RunnableWithProgress.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="ProgressMonitor.h">
+    <ClInclude Include="ProgressWnd.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -86,10 +83,7 @@
     <ClCompile Include="PreviewPane.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="RunnableWithProgress.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="ProgressMonitor.cpp">
+    <ClCompile Include="ProgressWnd.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
