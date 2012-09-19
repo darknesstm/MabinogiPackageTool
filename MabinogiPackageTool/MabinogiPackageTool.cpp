@@ -195,10 +195,10 @@ void CMabinogiPackageToolApp::OnAppAbout()
 {
 	//CAboutDlg aboutDlg;
 	//aboutDlg.DoModal();
-	CProgressDialog pDlg(theApp.GetMainWnd(), 0);
-	pDlg.DoModal();
+	CProgressDialog dlg(theApp.GetMainWnd()->GetSafeHwnd(), NULL);
+	dlg.DoModal();
 
-	AfxMessageBox(L"OK!");
+
 }
 
 // CMabinogiPackageToolApp 自定义加载/保存方法

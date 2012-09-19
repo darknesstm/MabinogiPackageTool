@@ -27,20 +27,32 @@ class CProgressDialog : public CWnd
 	DECLARE_DYNAMIC(CProgressDialog)
 
 public:
-	CProgressDialog(CWnd *pParentWnd, CRunnable *runnable);
+	CProgressDialog(HWND hParentWnd, CRunnable *runnable);
 	virtual ~CProgressDialog();
 
 protected:
 	DECLARE_MESSAGE_MAP()
 
-	BOOL Create(CWnd* pParent, LPCTSTR pszTitle);
+	BOOL Create(HWND hParentWnd, LPCTSTR pszTitle);
 public:
-	int DoModal(void);
+	/**
+	 * 
+	 * @param block ÊÇ·ñÊÇ¶ÂÈû²Ù×÷
+	 */
+	int DoModal();
+
 protected:
+	HWND m_hParentWnd;
 	CRunnable *m_pRunnable;
-	CProgressCtrl m_progress;
+
+	CStatic m_lblTaskName;
+	CProgressCtrl m_wndProgress;
+	CStatic m_lblSubTaskName;
+
 public:
 	afx_msg void OnClose();
+	afx_msg void OnDestroy();
+	afx_msg void OnSize(UINT nType, int cx, int cy);
 };
 
 
