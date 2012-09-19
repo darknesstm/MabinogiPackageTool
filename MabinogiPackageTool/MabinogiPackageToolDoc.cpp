@@ -12,7 +12,7 @@
 #include "MabinogiPackageToolDoc.h"
 
 #include <propkey.h>
-
+#include "ProgressDialog.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -63,10 +63,17 @@ void CMabinogiPackageToolDoc::Serialize(CArchive& ar)
 	}
 	else
 	{
-		// TODO: 在此添加加载代码
-		m_pPackInput = pack_input(ar.GetFile()->GetFilePath());
 
-		Parse();
+		m_lpszInputFileName = ar.GetFile()->GetFilePath();
+		CProgressDialog dlg(theApp.GetMainWnd()->GetSafeHwnd());
+		
+		dlg.DoModal([](CProgressMonitor *pMonitor, LPVOID pParam) 
+			{
+				CMabinogiPackageToolDoc *pThis = (CMabinogiPackageToolDoc*)pParam;
+				pThis->m_pPackInput = pack_input(pThis->m_lpszInputFileName);
+				pThis->Parse();
+				return 0;
+			}, this);
 
 	}
 }

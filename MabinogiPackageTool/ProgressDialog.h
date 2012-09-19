@@ -10,24 +10,14 @@ public:
 
 };
 
-class CRunnable
-{
-public:
-	CRunnable();
-	virtual ~CRunnable();
-
-	virtual int Run(CProgressMonitor *Monitor) = 0;
-
-};
-
-
+typedef int (*RunnableFunc)(CProgressMonitor *pMonitor, LPVOID pParam); 
 
 class CProgressDialog : public CWnd
 {
 	DECLARE_DYNAMIC(CProgressDialog)
 
 public:
-	CProgressDialog(HWND hParentWnd, CRunnable *runnable);
+	CProgressDialog(HWND hParentWnd);
 	virtual ~CProgressDialog();
 
 protected:
@@ -35,15 +25,11 @@ protected:
 
 	BOOL Create(HWND hParentWnd, LPCTSTR pszTitle);
 public:
-	/**
-	 * 
-	 * @param block ÊÇ·ñÊÇ¶ÂÈû²Ù×÷
-	 */
-	int DoModal();
+
+	int DoModal(RunnableFunc fnRunnable, LPVOID pParam);
 
 protected:
 	HWND m_hParentWnd;
-	CRunnable *m_pRunnable;
 
 	CStatic m_lblTaskName;
 	CProgressCtrl m_wndProgress;

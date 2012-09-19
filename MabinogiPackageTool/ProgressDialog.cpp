@@ -22,10 +22,9 @@ CProgressMonitor::~CProgressMonitor()
 
 IMPLEMENT_DYNAMIC(CProgressDialog, CWnd)
 
-CProgressDialog::CProgressDialog(HWND hParentWnd, CRunnable *runnable)
+CProgressDialog::CProgressDialog(HWND hParentWnd)
 {
 	Create(hParentWnd, TEXT("进度"));
-	m_pRunnable = runnable;
 	m_hParentWnd = hParentWnd;
 }
 
@@ -47,17 +46,20 @@ END_MESSAGE_MAP()
 struct SThreadParamter
 {
 	bool isThreadEnd;
-	CRunnable *pRunnable;
+	RunnableFunc fnRunnable;
 	CProgressMonitor *pMonitor;
+	LPVOID pParam;
 };
+
 UINT RunnableThreadFuc(LPVOID pParam)
 {
 	SThreadParamter *p = (SThreadParamter*) pParam;
 	try
 	{
-		TRACE0("111");
-		Sleep(10000);
-		TRACE0("222");
+		if(p->fnRunnable != nullptr)
+		{
+			p->fnRunnable(nullptr, pParam);
+		}
 	}
 	catch (...)
 	{
@@ -106,7 +108,7 @@ BOOL CProgressDialog::Create(HWND hParentWnd, LPCTSTR pszTitle)
 	return TRUE;
 }
 
-int CProgressDialog::DoModal()
+int CProgressDialog::DoModal(RunnableFunc fnRunnable, LPVOID pParam)
 {
 	::EnableWindow(m_hParentWnd, FALSE);
 	EnableWindow(TRUE);
@@ -117,8 +119,9 @@ int CProgressDialog::DoModal()
 	// 启动线程
 	SThreadParamter param;
 	param.isThreadEnd = false;
-	param.pRunnable = m_pRunnable;
+	param.fnRunnable = fnRunnable;
 	param.pMonitor = NULL;
+	param.pParam = pParam;
 	CWinThread *pThread = AfxBeginThread(RunnableThreadFuc, (LPVOID)&param);
 
 	// 拦截消息循环

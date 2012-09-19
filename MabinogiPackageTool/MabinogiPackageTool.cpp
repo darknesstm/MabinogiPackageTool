@@ -195,8 +195,11 @@ void CMabinogiPackageToolApp::OnAppAbout()
 {
 	//CAboutDlg aboutDlg;
 	//aboutDlg.DoModal();
-	CProgressDialog dlg(theApp.GetMainWnd()->GetSafeHwnd(), NULL);
-	dlg.DoModal();
+	CProgressDialog dlg(theApp.GetMainWnd()->GetSafeHwnd());
+	dlg.DoModal([](CProgressMonitor *pMonitor, LPVOID pParam)->int{
+		Sleep(4000);
+		return 0;
+	}, 0);
 
 
 }
