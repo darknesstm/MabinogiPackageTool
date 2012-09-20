@@ -63,20 +63,23 @@ void CMabinogiPackageToolDoc::Serialize(CArchive& ar)
 	}
 	else
 	{
-		static TCHAR szInputFileName[MAX_PATH + 1];
-		lstrcpy(szInputFileName, ar.GetFile()->GetFilePath());
+		// 以下代码废弃，因为MVC模式中，模型层不应该和界面有直接关系
+		//static TCHAR szInputFileName[MAX_PATH + 1];
+		//lstrcpy(szInputFileName, ar.GetFile()->GetFilePath());
 
-		// 启动单独线程读取数据
-		CProgressDialog dlg(theApp.GetMainWnd()->GetSafeHwnd(), [](CProgressMonitor *pMonitor, LPVOID pParam) -> UINT
-			{
-				CMabinogiPackageToolDoc *pThis = (CMabinogiPackageToolDoc*)pParam;
-				pThis->m_pPackInput = pack_input(szInputFileName);
-				pThis->Parse();
-				Sleep(5000);
-				return 0;
-			}, this);
-		
-		dlg.DoModal();
+		//// 启动单独线程读取数据
+		//CProgressDialog dlg(theApp.GetMainWnd()->GetSafeHwnd(), [](CProgressMonitor *pMonitor, LPVOID pParam) -> UINT
+		//	{
+		//		CMabinogiPackageToolDoc *pThis = (CMabinogiPackageToolDoc*)pParam;
+		//		pThis->m_pPackInput = pack_input(szInputFileName);
+		//		pThis->Parse();
+		//		return 0;
+		//	}, this);
+		//
+		//dlg.DoModal();
+
+		m_pPackInput = pack_input(ar.GetFile()->GetFilePath());
+		Parse();
 	}
 }
 
