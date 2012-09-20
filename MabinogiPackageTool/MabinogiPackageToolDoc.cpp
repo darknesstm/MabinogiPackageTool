@@ -63,18 +63,20 @@ void CMabinogiPackageToolDoc::Serialize(CArchive& ar)
 	}
 	else
 	{
+		static TCHAR szInputFileName[MAX_PATH + 1];
+		lstrcpy(szInputFileName, ar.GetFile()->GetFilePath());
 
-		m_lpszInputFileName = ar.GetFile()->GetFilePath();
-		CProgressDialog dlg(theApp.GetMainWnd()->GetSafeHwnd());
-		
-		dlg.DoModal([](CProgressMonitor *pMonitor, LPVOID pParam) 
+		// 启动单独线程读取数据
+		CProgressDialog dlg(theApp.GetMainWnd()->GetSafeHwnd(), [](CProgressMonitor *pMonitor, LPVOID pParam) -> UINT
 			{
 				CMabinogiPackageToolDoc *pThis = (CMabinogiPackageToolDoc*)pParam;
-				pThis->m_pPackInput = pack_input(pThis->m_lpszInputFileName);
+				pThis->m_pPackInput = pack_input(szInputFileName);
 				pThis->Parse();
+				Sleep(5000);
 				return 0;
 			}, this);
-
+		
+		dlg.DoModal();
 	}
 }
 

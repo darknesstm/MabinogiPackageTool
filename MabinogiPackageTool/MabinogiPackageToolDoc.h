@@ -102,7 +102,6 @@ public:
 #endif
 
 protected:
-	LPCTSTR m_lpszInputFileName;
 	PPACKINPUT m_pPackInput;
 	shared_ptr<CPackFolder> m_spRoot;
 

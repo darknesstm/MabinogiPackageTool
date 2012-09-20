@@ -10,14 +10,14 @@ public:
 
 };
 
-typedef int (*RunnableFunc)(CProgressMonitor *pMonitor, LPVOID pParam); 
+typedef UINT (*RunnableFunc)(CProgressMonitor *pMonitor, LPVOID pParam); 
 
 class CProgressDialog : public CWnd
 {
 	DECLARE_DYNAMIC(CProgressDialog)
 
 public:
-	CProgressDialog(HWND hParentWnd);
+	CProgressDialog(HWND hParentWnd, RunnableFunc fnRunnable, LPVOID pRunnableParam);
 	virtual ~CProgressDialog();
 
 protected:
@@ -26,10 +26,12 @@ protected:
 	BOOL Create(HWND hParentWnd, LPCTSTR pszTitle);
 public:
 
-	int DoModal(RunnableFunc fnRunnable, LPVOID pParam);
+	int DoModal();
 
 protected:
 	HWND m_hParentWnd;
+	RunnableFunc m_fnRunnable;
+	LPVOID m_pRunnableParam;
 
 	CStatic m_lblTaskName;
 	CProgressCtrl m_wndProgress;

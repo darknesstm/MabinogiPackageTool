@@ -12,8 +12,6 @@
 #include "MabinogiPackageToolDoc.h"
 #include "LeftView.h"
 
-#include "ProgressDialog.h"
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -193,15 +191,8 @@ END_MESSAGE_MAP()
 // 用于运行对话框的应用程序命令
 void CMabinogiPackageToolApp::OnAppAbout()
 {
-	//CAboutDlg aboutDlg;
-	//aboutDlg.DoModal();
-	CProgressDialog dlg(theApp.GetMainWnd()->GetSafeHwnd());
-	dlg.DoModal([](CProgressMonitor *pMonitor, LPVOID pParam)->int{
-		Sleep(4000);
-		return 0;
-	}, 0);
-
-
+	CAboutDlg aboutDlg;
+	aboutDlg.DoModal();
 }
 
 // CMabinogiPackageToolApp 自定义加载/保存方法

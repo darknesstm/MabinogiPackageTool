@@ -22,10 +22,13 @@ CProgressMonitor::~CProgressMonitor()
 
 IMPLEMENT_DYNAMIC(CProgressDialog, CWnd)
 
-CProgressDialog::CProgressDialog(HWND hParentWnd)
+CProgressDialog::CProgressDialog(HWND hParentWnd, RunnableFunc fnRunnable, LPVOID pRunnableParam)
 {
-	Create(hParentWnd, TEXT("进度"));
 	m_hParentWnd = hParentWnd;
+	m_fnRunnable = fnRunnable;
+	m_pRunnableParam = pRunnableParam;
+
+	Create(hParentWnd, TEXT("进度"));
 }
 
 CProgressDialog::~CProgressDialog()
@@ -48,17 +51,18 @@ struct SThreadParamter
 	bool isThreadEnd;
 	RunnableFunc fnRunnable;
 	CProgressMonitor *pMonitor;
-	LPVOID pParam;
+	LPVOID pRunnableParam;
 };
 
 UINT RunnableThreadFuc(LPVOID pParam)
 {
+	UINT result = 0;
 	SThreadParamter *p = (SThreadParamter*) pParam;
 	try
 	{
 		if(p->fnRunnable != nullptr)
 		{
-			p->fnRunnable(nullptr, pParam);
+			result = p->fnRunnable(nullptr, p->pRunnableParam);
 		}
 	}
 	catch (...)
@@ -67,7 +71,7 @@ UINT RunnableThreadFuc(LPVOID pParam)
 
 	p->isThreadEnd = true;
 
-	return 0;
+	return result;
 }
 // CProgressWnd 消息处理程序
 
@@ -81,7 +85,7 @@ BOOL CProgressDialog::Create(HWND hParentWnd, LPCTSTR pszTitle)
 	BOOL bSuccess = CreateEx(WS_EX_DLGMODALFRAME, // Extended style
                         csClassName,                       // Classname
                         pszTitle,                          // Title
-						WS_BORDER|WS_CAPTION|WS_POPUP,     // style
+						WS_BORDER|WS_CAPTION|WS_POPUP|WS_SIZEBOX,     // style
                         0,0,                               // position - updated soon.
                         390,130,                           // Size - updated soon
                         hParentWnd,            // handle to parent
@@ -103,12 +107,11 @@ BOOL CProgressDialog::Create(HWND hParentWnd, LPCTSTR pszTitle)
 		return FALSE;
 
 
-	//m_wndProgress.SendMessage(PBM_SETMARQUEE, TRUE, 200);
-
+	OnSize(0,390, 130);
 	return TRUE;
 }
 
-int CProgressDialog::DoModal(RunnableFunc fnRunnable, LPVOID pParam)
+int CProgressDialog::DoModal()
 {
 	::EnableWindow(m_hParentWnd, FALSE);
 	EnableWindow(TRUE);
@@ -117,16 +120,16 @@ int CProgressDialog::DoModal(RunnableFunc fnRunnable, LPVOID pParam)
 	ShowWindow(SW_SHOW);
 
 	// 启动线程
-	SThreadParamter param;
-	param.isThreadEnd = false;
-	param.fnRunnable = fnRunnable;
-	param.pMonitor = NULL;
-	param.pParam = pParam;
-	CWinThread *pThread = AfxBeginThread(RunnableThreadFuc, (LPVOID)&param);
+	SThreadParamter threadParam;
+	threadParam.isThreadEnd = false;
+	threadParam.fnRunnable = m_fnRunnable;
+	threadParam.pMonitor = NULL;
+	threadParam.pRunnableParam = m_pRunnableParam;
+	CWinThread *pThread = AfxBeginThread(RunnableThreadFuc, (LPVOID)&threadParam);
 
 	// 拦截消息循环
 	MSG msg;
-	while (!param.isThreadEnd) 
+	while (!threadParam.isThreadEnd) 
 	{
 		if (::PeekMessage(&msg, NULL,0,0,PM_NOREMOVE))
 		{
@@ -165,6 +168,27 @@ void CProgressDialog::OnSize(UINT nType, int cx, int cy)
 	CWnd::OnSize(nType, cx, cy);
 
 	// 从上到下依次是 任务名 进度条 子任务名
+	// 进度条保持固定高度为30
+	// 四周缩进5
+	if (cx > 10 && cy > 40)
+	{
+		if (::IsWindow(m_lblTaskName.m_hWnd))
+		{
+			m_lblTaskName.MoveWindow(5, 5, cx - 10, (cy - 10 - 30) / 2 - 5);
+		}
+	
+		if (::IsWindow(m_wndProgress.m_hWnd))
+		{
+			m_wndProgress.MoveWindow(5, (cy - 10 - 30) / 2, cx - 10, 30);
+		}
+	
+		if (::IsWindow(m_lblSubTaskName.m_hWnd))
+		{
+			m_lblSubTaskName.MoveWindow(5, (cy - 10 - 30) / 2 + 35, cx - 10, (cy - 10 - 30) / 2 - 5);
+		}
+	}
+
+	
 
 	//m_progress.MoveWindow();
 }
