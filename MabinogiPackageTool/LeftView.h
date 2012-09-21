@@ -46,6 +46,10 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnTvnSelchanged(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/);
+
+	afx_msg void OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnEditExtractTo();
 };
 
 #ifndef _DEBUG  // LeftView.cpp 中的调试版本

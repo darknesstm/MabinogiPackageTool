@@ -52,11 +52,11 @@ BEGIN
     "\r\n"
     "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
     "LANGUAGE 4, 2\r\n"
-    "#include ""res\\MabinogiPackageTool.rc2""  // ?¤? Microsoft Visual C++ ?à¨¤?-|ì??á¨o???\r\n"
-    "#include ""l.CHS\\afxres.rc""      // ?à¨o?á??á¨|?t\r\n"
+    "#include ""res\\MabinogiPackageTool.rc2""  // ??è? Microsoft Visual C++ ?¨¤?§?è?-|¨???¨￠?§o???\r\n"
+    "#include ""l.CHS\\afxres.rc""      // ?¨¤?§o?¨￠??¨￠?§|?t\r\n"
     "#if !defined(_AFXDLL)\r\n"
-    "#include ""l.CHS\\afxprint.rc""        // ??¨°¨??/??¨°¨????è¨¤¨¤?á¨o???\r\n"
-    "#include ""l.CHS\\afxribbon.rc""        // MFC 1|?¨1??o¨a???t¨???á¨o???\r\n"
+    "#include ""l.CHS\\afxprint.rc""        // ???§???§??/???§???§????¨¨?§?è?§?è?¨￠?§o???\r\n"
+    "#include ""l.CHS\\afxribbon.rc""        // MFC 1|??§1??o?§a???t?§???¨￠?§o???\r\n"
     "#endif\r\n"
     "#endif\r\n"
     "\0"
@@ -230,6 +230,14 @@ END
 IDR_HELP_MENU MENU
 BEGIN
     MENUITEM "关于 MabinogiPackageTool(&A)...", ID_APP_ABOUT
+END
+
+IDR_LEFT_POPUP_EDIT MENU
+BEGIN
+    POPUP "编辑"
+    BEGIN
+        MENUITEM "解压到...",                      ID_EDIT_EXTRACT_TO
+    END
 END
 
 
@@ -500,11 +508,11 @@ END
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE 4, 2
-#include "res\MabinogiPackageTool.rc2"  // ·? Microsoft Visual C++ ±à?-μ?×ê?′
-#include "l.CHS\afxres.rc"      // ±ê×?×é?t
+#include "res\MabinogiPackageTool.rc2"  // ?¤? Microsoft Visual C++ ?à¨¤?-|ì??á¨o???
+#include "l.CHS\afxres.rc"      // ?à¨o?á??á¨|?t
 #if !defined(_AFXDLL)
-#include "l.CHS\afxprint.rc"        // ′òó?/′òó??¤àà×ê?′
-#include "l.CHS\afxribbon.rc"        // MFC 1|?ü??oí???tì?×ê?′
+#include "l.CHS\afxprint.rc"        // ??¨°¨??/??¨°¨????è¨¤¨¤?á¨o???
+#include "l.CHS\afxribbon.rc"        // MFC 1|?¨1??o¨a???t¨???á¨o???
 #endif
 #endif
 

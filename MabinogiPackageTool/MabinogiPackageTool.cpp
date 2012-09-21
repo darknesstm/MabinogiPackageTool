@@ -212,6 +212,7 @@ void CMabinogiPackageToolApp::PreLoadState()
 	bNameValid = strName.LoadString(IDS_EDIT_MENU);
 	ASSERT(bNameValid);
 	GetContextMenuManager()->AddMenu(strName, IDR_POPUP_EDIT);
+	GetContextMenuManager()->AddMenu(strName + TEXT("@LeftView"), IDR_LEFT_POPUP_EDIT);
 }
 
 void CMabinogiPackageToolApp::LoadCustomState()

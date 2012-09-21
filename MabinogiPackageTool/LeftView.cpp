@@ -21,6 +21,10 @@ IMPLEMENT_DYNCREATE(CLeftView, CTreeView)
 
 BEGIN_MESSAGE_MAP(CLeftView, CTreeView)
 	ON_NOTIFY_REFLECT(TVN_SELCHANGED, &CLeftView::OnTvnSelchanged)
+	ON_WM_CONTEXTMENU()
+
+	ON_NOTIFY_REFLECT(NM_RCLICK, &CLeftView::OnNMRClick)
+	ON_COMMAND(ID_EDIT_EXTRACT_TO, &CLeftView::OnEditExtractTo)
 END_MESSAGE_MAP()
 
 
@@ -145,4 +149,41 @@ void CLeftView::OnTvnSelchanged(NMHDR *pNMHDR, LRESULT *pResult)
 	GetDocument()->m_pSelectedFolder = (CPackFolder*)GetTreeCtrl().GetItemData(GetTreeCtrl().GetSelectedItem());
 	GetDocument()->UpdateAllViews(this);
 	*pResult = 0;
+}
+
+
+void CLeftView::OnContextMenu(CWnd* /*pWnd*/, CPoint point)
+{
+#ifndef SHARED_HANDLERS
+	theApp.GetContextMenuManager()->ShowPopupMenu(IDR_LEFT_POPUP_EDIT, point.x, point.y, this, TRUE);
+#endif
+}
+
+
+void CLeftView::OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	NM_TREEVIEW* pHdr = (NM_TREEVIEW*) pNMHDR;
+
+	CPoint point;
+	GetCursorPos(&point);
+	ScreenToClient(&point);
+	// 同时选中节点
+	UINT uFlags;
+	HTREEITEM hItem = GetTreeCtrl().HitTest(point, &uFlags);
+	if ((hItem != NULL) && (TVHT_ONITEM & uFlags))
+	{
+	   GetTreeCtrl().Select(hItem, TVGN_CARET);
+	}
+
+	ClientToScreen(&point);
+
+	OnContextMenu(this, point);
+	*pResult = 0;
+}
+
+
+void CLeftView::OnEditExtractTo()
+{
+	// 解压整个文件夹
+
 }
