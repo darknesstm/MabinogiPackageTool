@@ -30,6 +30,8 @@ BEGIN_MESSAGE_MAP(CMabinogiPackageToolView, CListView)
 //	ON_WM_CANCELMODE()
 ON_NOTIFY_REFLECT(LVN_ITEMCHANGED, &CMabinogiPackageToolView::OnLvnItemchanged)
 ON_COMMAND(ID_EDIT_VIEW, &CMabinogiPackageToolView::OnEditView)
+ON_COMMAND(ID_EDIT_VIEW_AS, &CMabinogiPackageToolView::OnEditViewAs)
+ON_COMMAND(ID_EDIT_EXTRACT_TO, &CMabinogiPackageToolView::OnEditExtractTo)
 END_MESSAGE_MAP()
 
 // CMabinogiPackageToolView 构造/析构
@@ -252,9 +254,6 @@ void CMabinogiPackageToolView::OnEditView()
 
 		int nItem = GetListCtrl().GetNextSelectedItem(pos);
 		CPackEntry* pEntry = (CPackEntry*) GetListCtrl().GetItemData(nItem);
-		// 解压内容到一个临时文件
-		shared_ptr<vector<byte> > spData = pEntry->GetData();
-
 
 		CString fullName = CA2T(pEntry->GetEntry()->name);
 		fullName.Replace(TEXT("\\"), TEXT("_"));
@@ -263,10 +262,60 @@ void CMabinogiPackageToolView::OnEditView()
 		tempFileName += theApp.GetMyTempFilePrefix();
 		tempFileName += fullName;
 
-		CFile tempFile(tempFileName, CFile::modeCreate | CFile::modeWrite);
-		tempFile.Write(&*spData->begin(), spData->size());
-		tempFile.Close();
+		pEntry->WriteToFile(tempFileName);
 
 		::ShellExecute(0, TEXT("open"), tempFileName, 0, 0, SW_SHOW);
 	}
+}
+
+
+void CMabinogiPackageToolView::OnEditViewAs()
+{
+	auto pos = GetListCtrl().GetFirstSelectedItemPosition();
+	if (pos == nullptr)
+	{
+		// 没有选中则不处理
+	}
+	else
+	{
+		USES_CONVERSION;
+
+		int nItem = GetListCtrl().GetNextSelectedItem(pos);
+		CPackEntry* pEntry = (CPackEntry*) GetListCtrl().GetItemData(nItem);
+
+		CString fullName = CA2T(pEntry->GetEntry()->name);
+		fullName.Replace(TEXT("\\"), TEXT("_"));
+
+		CString tempFileName = theApp.GetMyTempPath(); // 最后的 '\' 应该是已经有了的
+		tempFileName += theApp.GetMyTempFilePrefix();
+		tempFileName += fullName;
+
+		pEntry->WriteToFile(tempFileName);
+
+		CString strCmd;
+		strCmd.Format(TEXT("shell32, OpenAs_RunDLL \"%s\""), tempFileName);
+		::ShellExecute(0, 0, TEXT("rundll32"), strCmd, 0, SW_SHOW);
+	}
+}
+
+
+void CMabinogiPackageToolView::OnEditExtractTo()
+{
+	auto pos = GetListCtrl().GetFirstSelectedItemPosition();
+	if (pos == nullptr)
+	{
+		// 没有选中则不处理
+	}
+	else
+	{
+		int nItem = GetListCtrl().GetNextSelectedItem(pos);
+		CPackEntry* pEntry = (CPackEntry*) GetListCtrl().GetItemData(nItem);
+
+		CFileDialog dlg(FALSE, NULL, pEntry->m_strName, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, NULL, this);
+		if( dlg.DoModal() == IDOK )
+		{
+			pEntry->WriteToFile(dlg.GetPathName());
+		}
+	}
+	
 }

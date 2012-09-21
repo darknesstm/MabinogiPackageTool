@@ -156,8 +156,8 @@ int CMabinogiPackageToolApp::ExitInstance()
 	BOOL bWorking = finder.FindFile(GetMyTempPath() + GetMyTempFilePrefix() + TEXT("*.*"));
 	while (bWorking)
 	{
-		CFile::Remove(finder.GetFilePath());
 		bWorking = finder.FindNextFile();
+		CFile::Remove(finder.GetFilePath());
 	}
 	return CWinAppEx::ExitInstance();
 }

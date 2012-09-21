@@ -31,6 +31,18 @@ public:
 		return pack_input_get_entry(m_pInput, m_index);
 	}
 	
+	/**
+	 * 写入指定的文件
+	 */
+	void WriteToFile(LPCTSTR lpszFileName)
+	{
+		shared_ptr<vector<byte> > spData = GetData();
+
+		CFile file(lpszFileName, CFile::modeCreate | CFile::modeWrite);
+		file.Write(&*spData->begin(), spData->size());
+		file.Close();
+	}
+
 	CString m_strName;
 	size_t m_index;
 	PPACKINPUT m_pInput;
