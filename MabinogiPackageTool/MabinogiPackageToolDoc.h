@@ -36,8 +36,30 @@ public:
 	 */
 	void WriteToFile(LPCTSTR lpszFileName)
 	{
-		shared_ptr<vector<byte> > spData = GetData();
+		// 如果路径不存在则需要创建
+		TCHAR szFullPath[MAX_PATH] = {0};
+		lstrcpy(szFullPath, lpszFileName);
+		for (int i = 0; szFullPath[i] != 0 && i < MAX_PATH; i++)
+		{
+			// 尝试创建所有文件夹
+			if (szFullPath[i] == '\\' || szFullPath[i] == '/')
+			{
+				if (szFullPath[i - 1] != ':')
+				{
+					// 临时建立一个文件夹路径
+					TCHAR old = szFullPath[i];
+					szFullPath[i] = 0; // 直接截断字符串
+					if (::GetFileAttributes(szFullPath) !=  FILE_ATTRIBUTE_DIRECTORY)
+					{
+						::CreateDirectory(szFullPath, NULL);
+					}
+					
+					szFullPath[i] = old; // 恢复
+				}
+			}
+		}
 
+		shared_ptr<vector<byte> > spData = GetData();
 		CFile file(lpszFileName, CFile::modeCreate | CFile::modeWrite);
 		file.Write(&*spData->begin(), spData->size());
 		file.Close();
@@ -74,6 +96,7 @@ public:
 		// 创建新的
 		shared_ptr<CPackFolder> spFolder(new CPackFolder);
 		spFolder->m_strName = name;
+		spFolder->m_parent = this;
 		m_children.push_back(spFolder);
 		return spFolder;
 	}

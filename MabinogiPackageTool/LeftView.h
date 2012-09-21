@@ -50,6 +50,8 @@ public:
 
 	afx_msg void OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnEditExtractTo();
+private:
+	void ExtractTo(CPackFolder *pFolder, CString strPath);
 };
 
 #ifndef _DEBUG  // LeftView.cpp 中的调试版本

@@ -185,5 +185,30 @@ void CLeftView::OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult)
 void CLeftView::OnEditExtractTo()
 {
 	// 解压整个文件夹
+	HTREEITEM hItem = GetTreeCtrl().GetSelectedItem();
+	if (hItem != nullptr)
+	{
+		CFolderPickerDialog dlg(0, 0, this);
+		if (dlg.DoModal() == IDOK)
+		{
+			CString path = dlg.GetPathName();
+			CPackFolder *pFolder = (CPackFolder*) GetTreeCtrl().GetItemData(hItem);
+			ExtractTo(pFolder, path);
+		}
+	}
+}
 
+
+void CLeftView::ExtractTo(CPackFolder *pFolder, CString strPath)
+{
+	for (auto spEntry : pFolder->m_entries)
+	{
+		USES_CONVERSION;
+		spEntry->WriteToFile( strPath + TEXT("\\") + CA2T(spEntry->GetEntry()->name));
+	}
+
+	for (auto spFolder : pFolder->m_children)
+	{
+		ExtractTo(spFolder.get(), strPath);
+	}
 }
