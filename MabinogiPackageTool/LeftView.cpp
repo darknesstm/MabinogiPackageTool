@@ -193,7 +193,7 @@ void CLeftView::OnEditExtractTo()
 		{
 			CString path = dlg.GetPathName();
 			CPackFolder *pFolder = (CPackFolder*) GetTreeCtrl().GetItemData(hItem);
-			ExtractTo(pFolder, path);
+			ExtractTo(pFolder, path + TEXT("\\") + pFolder->m_strName);
 		}
 	}
 }
@@ -204,11 +204,11 @@ void CLeftView::ExtractTo(CPackFolder *pFolder, CString strPath)
 	for (auto spEntry : pFolder->m_entries)
 	{
 		USES_CONVERSION;
-		spEntry->WriteToFile( strPath + TEXT("\\") + CA2T(spEntry->GetEntry()->name));
+		spEntry->WriteToFile( strPath + TEXT("\\") + spEntry->m_strName);
 	}
 
 	for (auto spFolder : pFolder->m_children)
 	{
-		ExtractTo(spFolder.get(), strPath);
+		ExtractTo(spFolder.get(), strPath  + TEXT("\\") + spFolder->m_strName);
 	}
 }
