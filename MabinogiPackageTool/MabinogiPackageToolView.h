@@ -46,6 +46,11 @@ protected:
 public:
 //	afx_msg void OnCancelMode();
 	afx_msg void OnLvnItemchanged(NMHDR *pNMHDR, LRESULT *pResult);
+private:
+	CString GetFileSizeText(unsigned long size);
+	CString GetFileTimeText(FILETIME* pFileTime);
+public:
+	afx_msg void OnEditView();
 };
 
 #ifndef _DEBUG  // MabinogiPackageToolView.cpp 中的调试版本

@@ -151,6 +151,14 @@ BOOL CMabinogiPackageToolApp::InitInstance()
 int CMabinogiPackageToolApp::ExitInstance()
 {
 	//TODO: 处理可能已添加的附加资源
+	// 删除之前创建的所有临时文件
+	CFileFind finder;
+	BOOL bWorking = finder.FindFile(GetMyTempPath() + GetMyTempFilePrefix() + TEXT("*.*"));
+	while (bWorking)
+	{
+		CFile::Remove(finder.GetFilePath());
+		bWorking = finder.FindNextFile();
+	}
 	return CWinAppEx::ExitInstance();
 }
 
@@ -217,4 +225,24 @@ void CMabinogiPackageToolApp::SaveCustomState()
 // CMabinogiPackageToolApp 消息处理程序
 
 
+CString CMabinogiPackageToolApp::GetMyTempPath(void)
+{
+	if (m_strTempPath.GetLength() == 0)
+	{
+		// 其实也可以直接使用CString的缓冲区
+		TCHAR szTempPath[MAX_PATH + 1] = {0};
+		::GetTempPath(MAX_PATH, szTempPath);
+		m_strTempPath = szTempPath;
+	}
+	return m_strTempPath;
+}
 
+
+CString CMabinogiPackageToolApp::GetMyTempFilePrefix(void)
+{
+	if (m_strTempFilePrefix.GetLength() == 0)
+	{
+		m_strTempFilePrefix.Format(TEXT("mpt_tmp_%u_"), (DWORD) AfxGetInstanceHandle());
+	}
+	return m_strTempFilePrefix;
+}

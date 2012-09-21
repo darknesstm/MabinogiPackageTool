@@ -29,6 +29,7 @@ BEGIN_MESSAGE_MAP(CMabinogiPackageToolView, CListView)
 	ON_WM_RBUTTONUP()
 //	ON_WM_CANCELMODE()
 ON_NOTIFY_REFLECT(LVN_ITEMCHANGED, &CMabinogiPackageToolView::OnLvnItemchanged)
+ON_COMMAND(ID_EDIT_VIEW, &CMabinogiPackageToolView::OnEditView)
 END_MESSAGE_MAP()
 
 // CMabinogiPackageToolView 构造/析构
@@ -157,16 +158,16 @@ void CMabinogiPackageToolView::OnUpdate(CView* pSender, LPARAM /*lHint*/, CObjec
 				int nItem = GetListCtrl().InsertItem(0, spFile->m_strName, shFilefo.iIcon);
 				GetListCtrl().SetItemText(nItem, 1, shFilefo.szTypeName);
 
-				CString tmp;
+				
 				// 原始大小
-				tmp.Format(TEXT("%d字节"), spFile->GetEntry()->decompress_size);
-				GetListCtrl().SetItemText(nItem, 2, tmp);
+				GetListCtrl().SetItemText(nItem, 2, GetFileSizeText(spFile->GetEntry()->decompress_size));
 				
 				// 压缩后大小
-				tmp.Format(TEXT("%d字节"), spFile->GetEntry()->compress_size);
-				GetListCtrl().SetItemText(nItem, 3, tmp);
+				GetListCtrl().SetItemText(nItem, 3, GetFileSizeText(spFile->GetEntry()->compress_size));
 
-
+				GetListCtrl().SetItemText(nItem, 4, GetFileTimeText(& spFile->GetEntry()->ft[2]));
+				GetListCtrl().SetItemText(nItem, 5, GetFileTimeText(& spFile->GetEntry()->ft[0]));
+				GetListCtrl().SetItemText(nItem, 6, GetFileTimeText(& spFile->GetEntry()->ft[4]));
 
 				GetListCtrl().SetItemData(nItem, (DWORD_PTR)spFile.get());
 			}
@@ -190,19 +191,82 @@ void CMabinogiPackageToolView::OnLvnItemchanged(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
 	if ( (pNMLV->uNewState & LVIS_SELECTED) == LVIS_SELECTED)
 	{
-		USES_CONVERSION;
+		//USES_CONVERSION;
 
-		CMainFrame *pFrame = reinterpret_cast<CMainFrame*>(theApp.GetMainWnd());
-		CPackEntry *pEntry = (CPackEntry*)GetListCtrl().GetItemData(pNMLV->iItem);
+		//CMainFrame *pFrame = reinterpret_cast<CMainFrame*>(theApp.GetMainWnd());
+		//CPackEntry *pEntry = (CPackEntry*)GetListCtrl().GetItemData(pNMLV->iItem);
 
-		shared_ptr<vector<byte> > spData = pEntry->GetData();
-		spData->push_back(0);
+		//shared_ptr<vector<byte> > spData = pEntry->GetData();
+		//spData->push_back(0);
 
-		CString temp =  (LPCTSTR)&*spData->begin() ;
-		//temp.Format(L"%d  %d", pNMLV->iItem, pNMLV->uNewState);
-		pFrame->GetPreviewPane().SetTextContent(temp);
+		//CString temp =  (LPCTSTR)&*spData->begin() ;
+		//pFrame->GetPreviewPane().SetTextContent(temp);
 	}
 
 
 	*pResult = 0;
+}
+
+
+CString CMabinogiPackageToolView::GetFileSizeText(unsigned long size)
+{
+	CString result;
+	if (size > 1024 * 1024 * 1024)
+	{
+		result.Format(TEXT("%.2f GB"), (float)size / (float)(1024 * 1024 * 1024));
+	}
+	else if (size > 1024 * 1024)
+	{
+		result.Format(TEXT("%.2f MB"), (float)size / (float)(1024 * 1024));
+	}
+	else if (size > 1024)
+	{
+		result.Format(TEXT("%.2f KB"), (float)size / (float)1024);
+	}
+	else
+	{
+		result.Format(TEXT("%d 字节"), size);
+	}
+	return result;
+}
+
+
+CString CMabinogiPackageToolView::GetFileTimeText(FILETIME* pFileTime)
+{
+	CString result;
+	CTime theTime(*pFileTime);
+	return theTime.Format(TEXT("%Y/%m/%d %H:%M:%S"));
+}
+
+
+void CMabinogiPackageToolView::OnEditView()
+{
+	auto pos = GetListCtrl().GetFirstSelectedItemPosition();
+	if (pos == nullptr)
+	{
+		// 没有选中则不处理
+	}
+	else
+	{
+		USES_CONVERSION;
+
+		int nItem = GetListCtrl().GetNextSelectedItem(pos);
+		CPackEntry* pEntry = (CPackEntry*) GetListCtrl().GetItemData(nItem);
+		// 解压内容到一个临时文件
+		shared_ptr<vector<byte> > spData = pEntry->GetData();
+
+
+		CString fullName = CA2T(pEntry->GetEntry()->name);
+		fullName.Replace(TEXT("\\"), TEXT("_"));
+
+		CString tempFileName = theApp.GetMyTempPath(); // 最后的 '\' 应该是已经有了的
+		tempFileName += theApp.GetMyTempFilePrefix();
+		tempFileName += fullName;
+
+		CFile tempFile(tempFileName, CFile::modeCreate | CFile::modeWrite);
+		tempFile.Write(&*spData->begin(), spData->size());
+		tempFile.Close();
+
+		::ShellExecute(0, TEXT("open"), tempFileName, 0, 0, SW_SHOW);
+	}
 }

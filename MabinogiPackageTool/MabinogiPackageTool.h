@@ -32,8 +32,15 @@ public:
 	virtual void LoadCustomState();
 	virtual void SaveCustomState();
 
+	CString GetMyTempPath(void);
+	CString GetMyTempFilePrefix(void);
+
 	afx_msg void OnAppAbout();
 	DECLARE_MESSAGE_MAP()
+private:
+	CString m_strTempPath;
+	CString m_strTempFilePrefix;
+	
 };
 
 extern CMabinogiPackageToolApp theApp;
