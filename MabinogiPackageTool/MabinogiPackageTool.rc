@@ -123,6 +123,7 @@ BEGIN
     POPUP "文件(&F)"
     BEGIN
         MENUITEM "打开(&O)...\tCtrl+O",           ID_FILE_OPEN
+        MENUITEM "制作PACK文件...",                 ID_FILE_MAKE_PACK_FILE
         MENUITEM "关闭(&C)",                      ID_FILE_CLOSE
         MENUITEM SEPARATOR
         MENUITEM "最近的文件",                       ID_FILE_MRU_FILE1, GRAYED
@@ -162,6 +163,7 @@ BEGIN
     POPUP "文件(&F)"
     BEGIN
         MENUITEM "打开(&O)...\tCtrl+O",           ID_FILE_OPEN
+        MENUITEM "制作PACK文件...",                 ID_FILE_MAKE_PACK_FILE
         MENUITEM "关闭(&C)",                      ID_FILE_CLOSE
         MENUITEM SEPARATOR
         MENUITEM "最近的文件",                       ID_FILE_MRU_FILE1, GRAYED

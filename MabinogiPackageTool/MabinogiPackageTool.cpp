@@ -24,6 +24,7 @@ BEGIN_MESSAGE_MAP(CMabinogiPackageToolApp, CWinAppEx)
 	// 基于文件的标准文档命令
 	ON_COMMAND(ID_FILE_NEW, &CWinAppEx::OnFileNew)
 	ON_COMMAND(ID_FILE_OPEN, &CWinAppEx::OnFileOpen)
+	ON_COMMAND(ID_FILE_MAKE_PACK_FILE, &CMabinogiPackageToolApp::OnFileMakePackFile)
 END_MESSAGE_MAP()
 
 
@@ -246,4 +247,10 @@ CString CMabinogiPackageToolApp::GetMyTempFilePrefix(void)
 		m_strTempFilePrefix.Format(TEXT("mpt_tmp_%u_"), (DWORD) AfxGetInstanceHandle());
 	}
 	return m_strTempFilePrefix;
+}
+
+
+void CMabinogiPackageToolApp::OnFileMakePackFile()
+{
+	
 }

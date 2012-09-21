@@ -41,6 +41,8 @@ private:
 	CString m_strTempPath;
 	CString m_strTempFilePrefix;
 	
+public:
+	afx_msg void OnFileMakePackFile();
 };
 
 extern CMabinogiPackageToolApp theApp;

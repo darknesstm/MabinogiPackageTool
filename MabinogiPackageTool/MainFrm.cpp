@@ -136,6 +136,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CList<UINT, UINT> lstBasicCommands;
 
 	lstBasicCommands.AddTail(ID_FILE_OPEN);
+	lstBasicCommands.AddTail(ID_FILE_CLOSE);
+	lstBasicCommands.AddTail(ID_FILE_MAKE_PACK_FILE);
 	lstBasicCommands.AddTail(ID_APP_EXIT);
 	lstBasicCommands.AddTail(ID_EDIT_VIEW);
 	lstBasicCommands.AddTail(ID_EDIT_VIEW_AS);

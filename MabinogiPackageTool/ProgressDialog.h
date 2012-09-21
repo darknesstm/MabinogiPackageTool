@@ -5,9 +5,16 @@
 class CProgressMonitor
 {
 public:
-	CProgressMonitor();
-	virtual ~CProgressMonitor();
+	CProgressMonitor() {};
+	virtual ~CProgressMonitor() {};
 
+	virtual void BeginTask(LPCTSTR lpszName, int totalWork) = 0;
+	virtual void Done() = 0;
+	virtual bool IsCanceled() = 0;
+	virtual void SetCanceled(bool value) = 0;
+	virtual void SetTaskName(LPCTSTR lpszName) = 0;
+	virtual void SubTask(LPCTSTR lpszName) = 0;
+	virtual void Worked(int lpszName) = 0;
 };
 
 typedef UINT (*RunnableFunc)(CProgressMonitor *pMonitor, LPVOID pParam); 

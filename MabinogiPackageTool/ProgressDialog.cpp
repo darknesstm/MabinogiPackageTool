@@ -10,6 +10,46 @@
 #define IDC_SUB_TASK_NAME     12
 #define IDC_PROGRESS 13
 
+///////////////////////////////
+class CProgressMonitorImpl : public CProgressMonitor
+{
+public:
+	CProgressMonitorImpl(HWND hWndProgress)
+	{
+		m_hWndProgress = hWndProgress;
+	};
+
+	virtual ~CProgressMonitorImpl()
+	{
+	};
+
+	virtual void BeginTask(LPCTSTR lpszName, int totalWork)
+	{
+		// Ö¸Õë×¢Òâ
+		//::PostMessage(m_hlblTaskName, WM_SETTEXT, (WPARAM)lpszName, 0);
+	};
+	virtual void Done()
+	{
+
+	};
+	virtual bool IsCanceled() { return m_isCanceled; };
+	virtual void SetCanceled(bool value) { m_isCanceled = value; };
+	virtual void SetTaskName(LPCTSTR lpszName) = 0;
+	virtual void SubTask(LPCTSTR lpszName) = 0;
+	virtual void Worked(int lpszName) = 0;
+
+private:
+	bool m_isCanceled;
+
+	HWND m_hlblTaskName;
+	HWND m_hlblSubTaskName;
+	HWND m_hWndProgress;
+};
+
+
+///////////////////////////////
+
+
 CProgressMonitor::CProgressMonitor()
 {
 }
