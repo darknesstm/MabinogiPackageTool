@@ -19,6 +19,7 @@ public:
 		m_hWndProgress = hWndProgress;
 		m_hlblTaskName = hlblTaskName;
 		m_hlblSubTaskName = hlblSubTaskName;
+		m_isCanceled = false;
 	};
 
 	virtual ~CProgressMonitorImpl()
@@ -103,12 +104,12 @@ private:
 
 IMPLEMENT_DYNAMIC(CProgressDialog, CWnd)
 
-CProgressDialog::CProgressDialog(HWND hParentWnd, RunnableFunc fnRunnable, LPVOID pRunnableParam)
+CProgressDialog::CProgressDialog(HWND hParentWnd, RunnableFunc fnRunnable, LPVOID pRunnableParam, bool bCancelable)
 {
 	m_hParentWnd = hParentWnd;
 	m_fnRunnable = fnRunnable;
 	m_pRunnableParam = pRunnableParam;
-
+	m_bCancelable = bCancelable;
 	Create(hParentWnd, TEXT("½ø¶È"));
 }
 
@@ -126,6 +127,7 @@ BEGIN_MESSAGE_MAP(CProgressDialog, CWnd)
 	ON_WM_DESTROY()
 	ON_WM_SIZE()
 	ON_WM_CTLCOLOR()
+//	ON_COMMAND(IDCANCEL, &CProgressDialog::OnCancel)
 END_MESSAGE_MAP()
 
 struct SThreadParamter
@@ -198,6 +200,11 @@ BOOL CProgressDialog::Create(HWND hParentWnd, LPCTSTR pszTitle)
 	m_lblSubTaskName.SetFont(&GetGlobalData()->fontRegular);
 	m_btnCancel.SetFont(&GetGlobalData()->fontRegular);
 
+	if (!m_bCancelable)
+	{
+		m_btnCancel.EnableWindow(false);
+	}
+
 	Layout();
 
 	return TRUE;
@@ -224,8 +231,27 @@ int CProgressDialog::DoModal()
 	MSG msg;
 	while (!threadParam.isThreadEnd) 
 	{
+    
 		if (::PeekMessage(&msg, NULL,0,0,PM_NOREMOVE))
 		{
+			if (m_bCancelable)
+			{
+				if ((msg.message == WM_CHAR) && (msg.wParam == VK_ESCAPE))
+				{
+					monitor.SetCanceled(true);
+				}
+
+				if (msg.message == WM_LBUTTONUP)
+				{
+					CRect rect;
+					m_btnCancel.GetWindowRect(rect);
+					if (rect.PtInRect(msg.pt))
+					{
+						monitor.SetCanceled(true);
+					}
+				}
+			}
+
 			if (!AfxGetApp()->PumpMessage()) 
 			{
 				::PostQuitMessage(0);
@@ -336,3 +362,9 @@ HBRUSH CProgressDialog::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 	}
 	return hbr;
 }
+
+
+//void CProgressDialog::OnCancel()
+//{
+//	
+//}

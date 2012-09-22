@@ -31,7 +31,7 @@ class CProgressDialog : public CWnd
 	DECLARE_DYNAMIC(CProgressDialog)
 
 public:
-	CProgressDialog(HWND hParentWnd, RunnableFunc fnRunnable, LPVOID pRunnableParam);
+	CProgressDialog(HWND hParentWnd, RunnableFunc fnRunnable, LPVOID pRunnableParam, bool bCancelable = true);
 	virtual ~CProgressDialog();
 
 protected:
@@ -46,6 +46,7 @@ protected:
 	HWND m_hParentWnd;
 	RunnableFunc m_fnRunnable;
 	LPVOID m_pRunnableParam;
+	bool m_bCancelable;
 
 	CStatic m_lblTaskName;
 	CProgressCtrl m_wndProgress;
@@ -59,6 +60,7 @@ private:
 	void Layout(void);
 public:
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+//	afx_msg void OnCancel();
 };
 
 

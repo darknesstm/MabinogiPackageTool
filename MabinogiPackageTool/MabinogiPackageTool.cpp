@@ -256,8 +256,12 @@ void CMabinogiPackageToolApp::OnFileMakePackFile()
 {
 	CProgressDialog dlg(GetMainWnd()->GetSafeHwnd(), [](CProgressMonitor *pMonitor, LPVOID pParam) -> UINT{
 		pMonitor->BeginTask(TEXT("开始一个进度"), 100);
-		for (int i = 0; i < 50; i++)
+		for (int i = 0; i < 100; i++)
 		{
+			if (pMonitor->IsCanceled())
+			{
+				break;
+			}
 			CString tmp;
 			tmp.Format(TEXT("- %d -"), i );
 			pMonitor->SubTask(tmp);
@@ -265,7 +269,7 @@ void CMabinogiPackageToolApp::OnFileMakePackFile()
 			Sleep(50);
 		}
 		return 0;
-	}, NULL);
+	}, NULL, false);
 
 	dlg.DoModal();
 }
