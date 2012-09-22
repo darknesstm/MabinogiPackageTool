@@ -109,6 +109,7 @@
     <ClInclude Include="MabinogiPackageToolDoc.h" />
     <ClInclude Include="MabinogiPackageToolView.h" />
     <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="MakePackFilePage.h" />
     <ClInclude Include="OutputWnd.h" />
     <ClInclude Include="PreviewPane.h" />
     <ClInclude Include="ProgressDialog.h" />
@@ -123,6 +124,7 @@
     <ClCompile Include="MabinogiPackageToolDoc.cpp" />
     <ClCompile Include="MabinogiPackageToolView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="MakePackFilePage.cpp" />
     <ClCompile Include="OutputWnd.cpp" />
     <ClCompile Include="PreviewPane.cpp" />
     <ClCompile Include="ProgressDialog.cpp" />

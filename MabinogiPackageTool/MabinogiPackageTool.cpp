@@ -13,6 +13,7 @@
 #include "LeftView.h"
 
 #include "ProgressDialog.h"
+#include "MakePackFilePage.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -254,22 +255,39 @@ CString CMabinogiPackageToolApp::GetMyTempFilePrefix(void)
 
 void CMabinogiPackageToolApp::OnFileMakePackFile()
 {
-	CProgressDialog dlg(GetMainWnd()->GetSafeHwnd(), [](CProgressMonitor *pMonitor, LPVOID pParam) -> UINT{
-		pMonitor->BeginTask(TEXT("开始一个进度"), 100);
-		for (int i = 0; i < 100; i++)
-		{
-			if (pMonitor->IsCanceled())
-			{
-				break;
-			}
-			CString tmp;
-			tmp.Format(TEXT("- %d -"), i );
-			pMonitor->SubTask(tmp);
-			pMonitor->Worked(1);
-			Sleep(50);
-		}
-		return 0;
-	}, NULL, false);
+	CMakePackFilePage page;
+	CPropertySheet sheet(TEXT("制作Pack文件向导"), theApp.GetMainWnd());
+	
+	sheet.AddPage(&page);
+	
+	sheet.m_psh.dwFlags |= PSH_WIZARD97;
+	sheet.m_psh.hInstance = AfxGetInstanceHandle();
 
-	dlg.DoModal();
+	sheet.SetWizardMode();
+	sheet.SetActivePage(&page);
+	sheet.DoModal();
+
+	//CFolderPickerDialog fdlg(TEXT("选择一个"));
+
+	//CProgressDialog dlg(GetMainWnd()->GetSafeHwnd(), [](CProgressMonitor *pMonitor, LPVOID pParam) -> UINT{
+	//	pMonitor->BeginTask(TEXT("开始一个进度"), 100);
+	//	for (int i = 0; i < 100; i++)
+	//	{
+	//		if (pMonitor->IsCanceled())
+	//		{
+	//			break;
+	//		}
+	//		CString tmp;
+	//		tmp.Format(TEXT("- %d -"), i );
+	//		pMonitor->SubTask(tmp);
+	//		pMonitor->Worked(1);
+	//		//pMonitor->Done();
+	//		Sleep(50);
+	//	}
+
+	//	Sleep(1000);
+	//	return 0;
+	//}, NULL, false);
+
+	//dlg.DoModal();
 }

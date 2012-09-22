@@ -27,6 +27,14 @@
 #define IDS_EDIT_MENU                   306
 #define ID_VIEW_PREVIEW                 310
 #define IDR_LEFT_POPUP_EDIT             310
+#define IDD_MAKEPACKFILEPAGE            312
+#define IDC_INPUT_FOLDER                1000
+#define IDC_OUTPUT_FILE                 1001
+#define IDC_BROWSER_INPUT               1002
+#define IDC_BROWSER_OUTPUT              1003
+#define IDC_VERSION                     1004
+#define IDC_SPIN1                       1005
+#define IDC_VERSION_SPIN                1005
 #define ID_32771                        32771
 #define ID_EDIT_VIEW                    32772
 #define ID_EDIT_VIEW_AS                 32773
@@ -43,7 +51,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        311
 #define _APS_NEXT_COMMAND_VALUE         32780
-#define _APS_NEXT_CONTROL_VALUE         1000
-#define _APS_NEXT_SYMED_VALUE           311
+#define _APS_NEXT_CONTROL_VALUE         1006
+#define _APS_NEXT_SYMED_VALUE           313
 #endif
 #endif

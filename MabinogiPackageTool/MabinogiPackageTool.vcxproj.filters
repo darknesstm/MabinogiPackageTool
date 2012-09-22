@@ -54,6 +54,9 @@
     <ClInclude Include="ProgressDialog.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="MakePackFilePage.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MabinogiPackageTool.cpp">
@@ -84,6 +87,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ProgressDialog.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MakePackFilePage.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
