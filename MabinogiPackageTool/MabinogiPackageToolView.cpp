@@ -193,16 +193,32 @@ void CMabinogiPackageToolView::OnLvnItemchanged(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
 	if ( (pNMLV->uNewState & LVIS_SELECTED) == LVIS_SELECTED)
 	{
-		//USES_CONVERSION;
+		CMainFrame *pFrame = reinterpret_cast<CMainFrame*>(theApp.GetMainWnd());
+		CPreviewPane &previewPane = pFrame->GetPreviewPane();
+		if (previewPane.IsVisible())
+		{
+			CPackEntry *pEntry = (CPackEntry*)GetListCtrl().GetItemData(pNMLV->iItem);
 
-		//CMainFrame *pFrame = reinterpret_cast<CMainFrame*>(theApp.GetMainWnd());
-		//CPackEntry *pEntry = (CPackEntry*)GetListCtrl().GetItemData(pNMLV->iItem);
+			if (pEntry->IsTextContent())
+			{
+				shared_ptr<vector<byte> > spData = pEntry->GetData();
+				spData->push_back(0);
+				spData->push_back(0);
 
-		//shared_ptr<vector<byte> > spData = pEntry->GetData();
-		//spData->push_back(0);
-
-		//CString temp =  (LPCTSTR)&*spData->begin() ;
-		//pFrame->GetPreviewPane().SetTextContent(temp);
+				if (IsTextUnicode(&*spData->begin(), spData->size() - 2, NULL))
+				{
+					USES_CONVERSION;
+					CString temp =  CW2CT((LPCWSTR)&*spData->begin()) ;
+					previewPane.SetTextContent(temp);
+				}
+				else
+				{
+					USES_CONVERSION;
+					CString temp =  CA2CT((LPCSTR)&*spData->begin()) ;
+					previewPane.SetTextContent(temp);
+				}
+			}
+		}
 	}
 
 

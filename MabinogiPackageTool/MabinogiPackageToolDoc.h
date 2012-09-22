@@ -32,6 +32,21 @@ public:
 	}
 	
 	/**
+	 * 是否是文本内容，目前根据扩展名判断
+	 */
+	bool IsTextContent()
+	{
+		int index = m_strName.ReverseFind(TEXT('.'));
+		if (index >= 0)
+		{
+			CString ext = m_strName.Mid( index + 1);
+			ext.MakeLower();
+			return ext == TEXT("xml") || ext == TEXT("txt");
+		}
+		return false;
+	}
+
+	/**
 	 * 写入指定的文件
 	 */
 	void WriteToFile(LPCTSTR lpszFileName)

@@ -5,6 +5,8 @@
 class CProgressMonitor
 {
 public:
+
+
 	CProgressMonitor() {};
 	virtual ~CProgressMonitor() {};
 
@@ -14,7 +16,12 @@ public:
 	virtual void SetCanceled(bool value) = 0;
 	virtual void SetTaskName(LPCTSTR lpszName) = 0;
 	virtual void SubTask(LPCTSTR lpszName) = 0;
-	virtual void Worked(int lpszName) = 0;
+	virtual void Worked(int work) = 0;
+
+	enum TaskTotal
+	{
+		UNKNOWN = -1
+	};
 };
 
 typedef UINT (*RunnableFunc)(CProgressMonitor *pMonitor, LPVOID pParam); 
@@ -43,11 +50,15 @@ protected:
 	CStatic m_lblTaskName;
 	CProgressCtrl m_wndProgress;
 	CStatic m_lblSubTaskName;
-
+	CButton m_btnCancel;
 public:
 	afx_msg void OnClose();
 	afx_msg void OnDestroy();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
+private:
+	void Layout(void);
+public:
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 };
 
 

@@ -64,5 +64,5 @@ void CPreviewPane::SetTextContent(LPCTSTR content)
 
 void CPreviewPane::UpdateFonts()
 {
-	m_txtControl.SetFont(&afxGlobalData.fontRegular);
+	m_txtControl.SetFont(&GetGlobalData()->fontRegular);
 }

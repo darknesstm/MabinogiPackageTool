@@ -12,6 +12,8 @@
 #include "MabinogiPackageToolDoc.h"
 #include "LeftView.h"
 
+#include "ProgressDialog.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -252,5 +254,18 @@ CString CMabinogiPackageToolApp::GetMyTempFilePrefix(void)
 
 void CMabinogiPackageToolApp::OnFileMakePackFile()
 {
-	
+	CProgressDialog dlg(GetMainWnd()->GetSafeHwnd(), [](CProgressMonitor *pMonitor, LPVOID pParam) -> UINT{
+		pMonitor->BeginTask(TEXT("开始一个进度"), 100);
+		for (int i = 0; i < 50; i++)
+		{
+			CString tmp;
+			tmp.Format(TEXT("- %d -"), i );
+			pMonitor->SubTask(tmp);
+			pMonitor->Worked(1);
+			Sleep(50);
+		}
+		return 0;
+	}, NULL);
+
+	dlg.DoModal();
 }
