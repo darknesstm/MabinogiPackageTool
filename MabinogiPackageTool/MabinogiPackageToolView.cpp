@@ -176,6 +176,15 @@ void CMabinogiPackageToolView::OnUpdate(CView* pSender, LPARAM /*lHint*/, CObjec
 			}
 		}
 
+		GetListCtrl().SortItemsEx([](LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort) -> int CALLBACK 
+			{
+				CListCtrl* pListCtrl = &((CMabinogiPackageToolView*) lParamSort)->GetListCtrl();
+				CString    strItem1 = pListCtrl->GetItemText(static_cast<int>(lParam1), 0);
+				CString    strItem2 = pListCtrl->GetItemText(static_cast<int>(lParam2), 0);
+
+				return strItem1.CompareNoCase(strItem2);
+			}, (DWORD_PTR)this);
+
 		GetListCtrl().UnlockWindowUpdate();
 	}
 }
