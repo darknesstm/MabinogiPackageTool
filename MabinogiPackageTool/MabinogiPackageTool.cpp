@@ -217,6 +217,9 @@ void CMabinogiPackageToolApp::PreLoadState()
 	ASSERT(bNameValid);
 	GetContextMenuManager()->AddMenu(strName, IDR_POPUP_EDIT);
 	GetContextMenuManager()->AddMenu(strName + TEXT("@LeftView"), IDR_LEFT_POPUP_EDIT);
+
+	//HMENU hMenu = GetContextMenuManager()->GetMenuById(IDR_LEFT_POPUP_EDIT);
+	//::SetMenuDefaultItem(hMenu, 0, TRUE);
 }
 
 void CMabinogiPackageToolApp::LoadCustomState()

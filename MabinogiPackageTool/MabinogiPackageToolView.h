@@ -53,6 +53,7 @@ public:
 	afx_msg void OnEditView();
 	afx_msg void OnEditViewAs();
 	afx_msg void OnEditExtractTo();
+	afx_msg void OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult);
 };
 
 #ifndef _DEBUG  // MabinogiPackageToolView.cpp 中的调试版本

@@ -32,6 +32,7 @@ ON_NOTIFY_REFLECT(LVN_ITEMCHANGED, &CMabinogiPackageToolView::OnLvnItemchanged)
 ON_COMMAND(ID_EDIT_VIEW, &CMabinogiPackageToolView::OnEditView)
 ON_COMMAND(ID_EDIT_VIEW_AS, &CMabinogiPackageToolView::OnEditViewAs)
 ON_COMMAND(ID_EDIT_EXTRACT_TO, &CMabinogiPackageToolView::OnEditExtractTo)
+ON_NOTIFY_REFLECT(NM_DBLCLK, &CMabinogiPackageToolView::OnNMDblclk)
 END_MESSAGE_MAP()
 
 // CMabinogiPackageToolView ¹¹Ôì/Îö¹¹
@@ -280,7 +281,12 @@ void CMabinogiPackageToolView::OnEditView()
 
 		pEntry->WriteToFile(tempFileName);
 
-		::ShellExecute(0, TEXT("open"), tempFileName, 0, 0, SW_SHOW);
+		if ((DWORD)::ShellExecute(0, TEXT("open"), tempFileName, 0, 0, SW_SHOW) <= 32)
+		{
+			CString strCmd;
+			strCmd.Format(TEXT("shell32, OpenAs_RunDLL \"%s\""), tempFileName);
+			::ShellExecute(0, 0, TEXT("rundll32"), strCmd, 0, SW_SHOW);
+		};
 	}
 }
 
@@ -334,4 +340,13 @@ void CMabinogiPackageToolView::OnEditExtractTo()
 		}
 	}
 	
+}
+
+
+void CMabinogiPackageToolView::OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	
+	OnEditView();
+	*pResult = 0;
 }
