@@ -9,6 +9,7 @@
 using namespace std::tr1;
 
 class CPackFolder;
+class CProgressMonitor;
 class CMabinogiPackageToolDoc;
 class CLeftView : public CTreeView
 {
@@ -51,7 +52,7 @@ public:
 	afx_msg void OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnEditExtractTo();
 private:
-	void ExtractTo(CPackFolder *pFolder, CString strPath);
+	void ExtractTo(CPackFolder *pFolder, CString strPath, CProgressMonitor *pMonitor);
 };
 
 #ifndef _DEBUG  // LeftView.cpp 中的调试版本

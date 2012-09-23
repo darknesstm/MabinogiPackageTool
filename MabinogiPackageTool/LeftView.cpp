@@ -9,6 +9,7 @@
 #include "LeftView.h"
 
 #include <Uxtheme.h>
+#include "ProgressDialog.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -191,24 +192,60 @@ void CLeftView::OnEditExtractTo()
 		CFolderPickerDialog dlg(0, 0, this);
 		if (dlg.DoModal() == IDOK)
 		{
-			CString path = dlg.GetPathName();
-			CPackFolder *pFolder = (CPackFolder*) GetTreeCtrl().GetItemData(hItem);
-			ExtractTo(pFolder, path + TEXT("\\") + pFolder->m_strName);
+			static CString path;
+			static CPackFolder *pFolder;
+
+			path = dlg.GetPathName();
+			pFolder = (CPackFolder*) GetTreeCtrl().GetItemData(hItem);
+			CProgressDialog dlg(theApp.GetMainWnd()->GetSafeHwnd(), [](CProgressMonitor *pMonitor, LPVOID pParam) -> UINT
+			{
+				pMonitor->BeginTask(TEXT("½âÑ¹µ½£º") + path, -1);
+				CLeftView *pLeftView = (CLeftView*) pParam;
+				pLeftView->ExtractTo(pFolder, path + TEXT("\\") + pFolder->m_strName, pMonitor);
+				return 0;
+			}, this, true);
+
+			dlg.DoModal();
 		}
 	}
 }
 
 
-void CLeftView::ExtractTo(CPackFolder *pFolder, CString strPath)
+void CLeftView::ExtractTo(CPackFolder *pFolder, CString strPath, CProgressMonitor *pMonitor)
 {
 	for (auto spEntry : pFolder->m_entries)
 	{
-		USES_CONVERSION;
-		spEntry->WriteToFile( strPath + TEXT("\\") + spEntry->m_strName);
+		CString outputPath = strPath + TEXT("\\") + spEntry->m_strName;
+		if (pMonitor != nullptr)
+		{
+			if (pMonitor->IsCanceled())
+			{
+				return;
+			}
+			else
+			{
+				USES_CONVERSION;
+				pMonitor->SubTask(outputPath);
+			}
+		}
+		
+		spEntry->WriteToFile(outputPath);
 	}
 
 	for (auto spFolder : pFolder->m_children)
 	{
-		ExtractTo(spFolder.get(), strPath  + TEXT("\\") + spFolder->m_strName);
+		CString outputPath = strPath  + TEXT("\\") + spFolder->m_strName;
+		if (pMonitor != nullptr)
+		{
+			if (pMonitor->IsCanceled())
+			{
+				return;
+			}
+			else
+			{
+				pMonitor->SubTask(outputPath);
+			}
+		}
+		ExtractTo(spFolder.get(), outputPath, pMonitor);
 	}
 }

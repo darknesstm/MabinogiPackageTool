@@ -31,6 +31,9 @@ class CProgressDialog : public CWnd
 	DECLARE_DYNAMIC(CProgressDialog)
 
 public:
+	/**
+	 * 需要使用顶层窗口作为父窗口
+	 */
 	CProgressDialog(HWND hParentWnd, RunnableFunc fnRunnable, LPVOID pRunnableParam, bool bCancelable = true);
 	virtual ~CProgressDialog();
 
