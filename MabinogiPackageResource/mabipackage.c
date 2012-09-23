@@ -231,8 +231,10 @@ PPACKOUTPUT pack_output(LPCTSTR file_name, unsigned long version)
 
 #ifdef _UNICODE
 	output->_file = _wfopen(file_name, L"wb");
+	wcscpy(output->_file_name, file_name);
 #else
 	output->_file = fopen(file_name, "wb");
+	strcpy(output->_file_name, file_name);
 #endif
 
 	// TODO 文件打开错误检测
@@ -307,6 +309,7 @@ size_t _put_name_chars(const char * name, char * buffer)
 			type = 4;
 			result = 0x60;
 		}
+		memset(buffer, 0, result);
 
 		buffer[0] = type;
 		strcpy(buffer + 1, name);
@@ -324,12 +327,42 @@ size_t _put_name_chars(const char * name, char * buffer)
 		{
 			put_len = (len - put_len + 0x10);
 		}
+
+		result = put_len + 5;
+		memset(buffer, 0, result);
 		buffer[0] = 5;
 		memcpy(buffer + 1, &put_len, 2);
 		strcpy(buffer + 5, name);
 
-		return put_len + 5;
+		return result;
 	}
+}
+
+/**
+ * 放弃输出
+ */
+void pack_output_drop(PPACKOUTPUT output)
+{
+	fclose(output->_file);
+	fclose(output->_tmp_file);
+
+	if (output->_buffer)
+	{
+		free(output->_buffer);
+		output->_buffer = 0;
+	}
+
+	if (output->_entries)
+	{
+		free(output->_entries);
+		output->_entries = 0;
+	}
+	// 删除临时文件
+#ifdef _UNICODE
+	_wremove(output->_tmp_file_name);
+#else
+	remove(output->_tmp_file_name);
+#endif
 }
 
 void pack_output_close(PPACKOUTPUT output)
@@ -365,7 +398,7 @@ void pack_output_close(PPACKOUTPUT output)
 	{
 		p_entry = &output->_entries[i];
 		// 这里申请的内存在下面被释放
-		buffer = (char *) malloc(strlen(p_entry->name) + 0x16);
+		buffer = (char *) malloc(strlen(p_entry->name) + 0x60);
 		name_chars_len = _put_name_chars(p_entry->name, buffer);
 		fwrite(buffer, name_chars_len, 1, output->_file);
 		
@@ -379,7 +412,7 @@ void pack_output_close(PPACKOUTPUT output)
 		fwrite(&info, sizeof(_s_pack_item_info), 1, output->_file);
 		free(buffer);
 
-		list_header.list_header_size += name_chars_len;
+		list_header.list_header_size += name_chars_len + sizeof(_s_pack_item_info);
 		list_header.data_section_size += p_entry->compress_size;
 	}
 
@@ -547,7 +580,7 @@ void pack_output_close_entry(PPACKOUTPUT output)
 	}
 	else
 	{
-		p_entry->offset = output->_entries[output->_pos - 1].offset + dst_len;
+		p_entry->offset = output->_entries[output->_pos - 1].offset + output->_entries[output->_pos - 1].compress_size;
 	}
 
 	free(output->_buffer);

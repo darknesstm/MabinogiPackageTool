@@ -33,6 +33,7 @@ typedef struct _s_pack_output_stram {
 	
 	size_t _pos;
 	FILE *_file;
+	TCHAR _file_name[MAX_PATH];
 	FILE *_tmp_file;				// 压缩内容的临时文件
 	TCHAR _tmp_file_name[MAX_PATH];
 
@@ -50,6 +51,10 @@ PPACKOUTPUT pack_output(LPCTSTR file_name, unsigned long version);
 
 void pack_input_close(PPACKINPUT input);
 void pack_output_close(PPACKOUTPUT output);
+/**
+ * 放弃输出
+ */
+void pack_output_drop(PPACKOUTPUT output);
 
 void pack_inpu_reset(PPACKINPUT input);
 size_t pack_input_get_entry_count(PPACKINPUT input);

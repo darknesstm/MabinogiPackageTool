@@ -21,12 +21,14 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnSetActive();
-private:
+public:
 	CString m_strInputFolder;
 	CString m_strOutputFile;
-	int m_nVersion;
-	CSpinButtonCtrl m_spinVersion;
+	unsigned long m_ulVersion;
+//	CSpinButtonCtrl m_spinVersion;
 public:
 	afx_msg void OnClickedBrowserInput();
 	afx_msg void OnClickedBrowserOutput();
+	virtual BOOL OnWizardFinish();
+	virtual BOOL OnInitDialog();
 };

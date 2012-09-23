@@ -252,6 +252,27 @@ CString CMabinogiPackageToolApp::GetMyTempFilePrefix(void)
 	return m_strTempFilePrefix;
 }
 
+void RecursiveFindFile(CString& strPath, vector<CString> &collector)
+{
+	CFileFind ff;
+	BOOL bFind = ff.FindFile(strPath + TEXT("\\*.*"));
+
+	while(bFind)
+	{
+		bFind = ff.FindNextFile();
+		if (ff.IsDots())
+			continue;
+
+		if (ff.IsDirectory())
+		{
+			RecursiveFindFile(ff.GetFilePath(), collector);
+		}
+		else
+		{
+			collector.push_back(ff.GetFilePath());
+		}
+	}
+}
 
 void CMabinogiPackageToolApp::OnFileMakePackFile()
 {
@@ -265,7 +286,81 @@ void CMabinogiPackageToolApp::OnFileMakePackFile()
 
 	sheet.SetWizardMode();
 	sheet.SetActivePage(&page);
-	sheet.DoModal();
+	if (sheet.DoModal() ==  ID_WIZFINISH)
+	{
+		CProgressDialog dlg(GetMainWnd()->GetSafeHwnd(), [](CProgressMonitor *pMonitor, LPVOID pParam) -> UINT
+		{
+			CMakePackFilePage *pPage = (CMakePackFilePage*) pParam;
+			
+			pMonitor->BeginTask(TEXT("制作pack文件：") + pPage->m_strOutputFile, -1);
+
+			// 先查找出所有的文件
+			vector<CString> filePaths;
+			RecursiveFindFile(pPage->m_strInputFolder, filePaths);
+			int prefixLength = lstrlen(pPage->m_strInputFolder);
+
+			PPACKOUTPUT output = pack_output(pPage->m_strOutputFile, pPage->m_ulVersion);
+			for (CString& filePath : filePaths)
+			{
+				pMonitor->SubTask(filePath);
+
+				USES_CONVERSION;
+
+				if (pMonitor->IsCanceled())
+				{
+					break;
+				}
+				s_pack_entry entry;
+				CFile file(filePath, CFile::modeRead);
+				CFileStatus fs;
+				file.GetStatus(fs);
+
+				SYSTEMTIME  st;  
+				FILETIME  ft;
+
+				fs.m_mtime.GetAsSystemTime(st); 
+				::SystemTimeToFileTime(&st,  &ft);
+				memcpy(&entry.ft[0], &ft, sizeof(FILETIME));
+				memcpy(&entry.ft[1], &ft, sizeof(FILETIME));
+
+				fs.m_ctime.GetAsSystemTime(st); 
+				::SystemTimeToFileTime(&st,  &ft); 
+				memcpy(&entry.ft[2], &ft, sizeof(FILETIME));
+				memcpy(&entry.ft[3], &ft, sizeof(FILETIME));
+
+				fs.m_atime.GetAsSystemTime(st); 
+				::SystemTimeToFileTime(&st,  &ft); 
+				memcpy(&entry.ft[4], &ft, sizeof(FILETIME));
+
+				// 将全路径转换为相对路径
+				LPCTSTR lpszRelativePath = ((LPCTSTR)filePath) + prefixLength + 1;
+				lstrcpyA( entry.name, CT2A(lpszRelativePath));
+
+				
+				// 写入文件内容，其实可以使用内存文件映射提高效率
+				char *buffer = new char[fs.m_size];
+				file.Read(buffer, fs.m_size);
+				pack_output_put_next_entry(output, &entry);
+				pack_output_write(output, (byte*)buffer, fs.m_size);
+				pack_output_close_entry(output);
+				free(buffer);
+				file.Close();
+			}
+
+			if (pMonitor->IsCanceled())
+			{
+				pack_output_drop(output);
+			}
+			else
+			{
+				pack_output_close(output);
+			}
+
+			return 0;
+		}, &page, true);
+
+		dlg.DoModal();
+	}
 
 	//CFolderPickerDialog fdlg(TEXT("选择一个"));
 
