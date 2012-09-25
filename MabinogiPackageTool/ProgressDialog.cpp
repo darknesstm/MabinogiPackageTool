@@ -164,7 +164,7 @@ BOOL CProgressDialog::Create(HWND hParentWnd, LPCTSTR pszTitle)
 {
 	CString csClassName = AfxRegisterWndClass(CS_OWNDC|CS_HREDRAW|CS_VREDRAW,
                                               ::LoadCursor(NULL, IDC_APPSTARTING),
-											  GetGlobalData()->brBtnFace);
+											  theApp.GetDefaultBackground());
 
 	BOOL bSuccess = CreateEx(WS_EX_DLGMODALFRAME, // Extended style
                         csClassName,                       // Classname
@@ -196,9 +196,9 @@ BOOL CProgressDialog::Create(HWND hParentWnd, LPCTSTR pszTitle)
 	if (!bSuccess) 
 		return FALSE;
 
-	m_lblTaskName.SetFont(&GetGlobalData()->fontRegular);
-	m_lblSubTaskName.SetFont(&GetGlobalData()->fontRegular);
-	m_btnCancel.SetFont(&GetGlobalData()->fontRegular);
+	m_lblTaskName.SetFont(theApp.GetDefaultFont());
+	m_lblSubTaskName.SetFont(theApp.GetDefaultFont());
+	m_btnCancel.SetFont(theApp.GetDefaultFont());
 
 	if (!m_bCancelable)
 	{
@@ -355,7 +355,7 @@ HBRUSH CProgressDialog::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 		pDC->SetBkMode(TRANSPARENT); 
 		//ÉèÖÃ±³¾°ÎªÍ¸Ã÷
 		
-		return GetGlobalData()->brBtnFace;
+		return theApp.GetDefaultBackground();
 	}
 	default:
 		break;

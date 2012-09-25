@@ -182,6 +182,15 @@ void CLeftView::OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
+static CString path;
+static CPackFolder *pFolder;
+UINT _lambda_OnEditExtractTo(CProgressMonitor *pMonitor, LPVOID pParam)
+{
+	pMonitor->BeginTask(TEXT("解压到：") + path, -1);
+	CLeftView *pLeftView = (CLeftView*) pParam;
+	pLeftView->ExtractTo(pFolder, path + TEXT("\\") + pFolder->m_strName, pMonitor);
+	return 0;
+}
 
 void CLeftView::OnEditExtractTo()
 {
@@ -192,19 +201,19 @@ void CLeftView::OnEditExtractTo()
 		CFolderPickerDialog dlg(0, 0, this);
 		if (dlg.DoModal() == IDOK)
 		{
-			static CString path;
-			static CPackFolder *pFolder;
+			//static CString path;
+			//static CPackFolder *pFolder;
 
 			path = dlg.GetPathName();
 			pFolder = (CPackFolder*) GetTreeCtrl().GetItemData(hItem);
-			CProgressDialog dlg(theApp.GetMainWnd()->GetSafeHwnd(), [](CProgressMonitor *pMonitor, LPVOID pParam) -> UINT
-			{
-				pMonitor->BeginTask(TEXT("解压到：") + path, -1);
-				CLeftView *pLeftView = (CLeftView*) pParam;
-				pLeftView->ExtractTo(pFolder, path + TEXT("\\") + pFolder->m_strName, pMonitor);
-				return 0;
-			}, this, true);
-
+			//CProgressDialog dlg(theApp.GetMainWnd()->GetSafeHwnd(), [](CProgressMonitor *pMonitor, LPVOID pParam) -> UINT
+			//{
+			//	pMonitor->BeginTask(TEXT("解压到：") + path, -1);
+			//	CLeftView *pLeftView = (CLeftView*) pParam;
+			//	pLeftView->ExtractTo(pFolder, path + TEXT("\\") + pFolder->m_strName, pMonitor);
+			//	return 0;
+			//}, this, true);
+			CProgressDialog dlg(theApp.GetMainWnd()->GetSafeHwnd(), _lambda_OnEditExtractTo, this, true);
 			dlg.DoModal();
 		}
 	}
@@ -213,8 +222,11 @@ void CLeftView::OnEditExtractTo()
 
 void CLeftView::ExtractTo(CPackFolder *pFolder, CString strPath, CProgressMonitor *pMonitor)
 {
-	for (auto spEntry : pFolder->m_entries)
+	for(auto iter = pFolder->m_entries.begin();iter != pFolder->m_entries.end();++iter)
 	{
+		auto spEntry = *iter;
+	//for (auto spEntry : pFolder->m_entries)
+	//{
 		CString outputPath = strPath + TEXT("\\") + spEntry->m_strName;
 		if (pMonitor != nullptr)
 		{
@@ -232,8 +244,11 @@ void CLeftView::ExtractTo(CPackFolder *pFolder, CString strPath, CProgressMonito
 		spEntry->WriteToFile(outputPath);
 	}
 
-	for (auto spFolder : pFolder->m_children)
+	for(auto iter = pFolder->m_children.begin();iter != pFolder->m_children.end();++iter)
 	{
+		auto spFolder = *iter;
+	//for (auto spFolder : pFolder->m_children)
+	//{
 		CString outputPath = strPath  + TEXT("\\") + spFolder->m_strName;
 		if (pMonitor != nullptr)
 		{

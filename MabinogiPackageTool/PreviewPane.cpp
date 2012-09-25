@@ -64,5 +64,5 @@ void CPreviewPane::SetTextContent(LPCTSTR content)
 
 void CPreviewPane::UpdateFonts()
 {
-	m_txtControl.SetFont(&GetGlobalData()->fontRegular);
+	m_txtControl.SetFont(theApp.GetDefaultFont());
 }

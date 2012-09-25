@@ -139,6 +139,14 @@ void CMabinogiPackageToolView::OnStyleChanged(int nStyleType, LPSTYLESTRUCT lpSt
 	CListView::OnStyleChanged(nStyleType,lpStyleStruct);	
 }
 
+int CALLBACK lambda_OnUpdate(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
+{
+	CListCtrl* pListCtrl = &((CMabinogiPackageToolView*) lParamSort)->GetListCtrl();
+	CString    strItem1 = pListCtrl->GetItemText(static_cast<int>(lParam1), 0);
+	CString    strItem2 = pListCtrl->GetItemText(static_cast<int>(lParam2), 0);
+
+	return strItem1.CompareNoCase(strItem2);
+}
 
 void CMabinogiPackageToolView::OnUpdate(CView* pSender, LPARAM /*lHint*/, CObject* /*pHint*/)
 {
@@ -176,14 +184,16 @@ void CMabinogiPackageToolView::OnUpdate(CView* pSender, LPARAM /*lHint*/, CObjec
 			}
 		}
 
-		GetListCtrl().SortItemsEx([](LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort) -> int CALLBACK 
-			{
-				CListCtrl* pListCtrl = &((CMabinogiPackageToolView*) lParamSort)->GetListCtrl();
-				CString    strItem1 = pListCtrl->GetItemText(static_cast<int>(lParam1), 0);
-				CString    strItem2 = pListCtrl->GetItemText(static_cast<int>(lParam2), 0);
+		//GetListCtrl().SortItemsEx([](LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort) -> int CALLBACK 
+		//	{
+		//		CListCtrl* pListCtrl = &((CMabinogiPackageToolView*) lParamSort)->GetListCtrl();
+		//		CString    strItem1 = pListCtrl->GetItemText(static_cast<int>(lParam1), 0);
+		//		CString    strItem2 = pListCtrl->GetItemText(static_cast<int>(lParam2), 0);
 
-				return strItem1.CompareNoCase(strItem2);
-			}, (DWORD_PTR)this);
+		//		return strItem1.CompareNoCase(strItem2);
+		//	}, (DWORD_PTR)this);
+
+		GetListCtrl().SortItemsEx(lambda_OnUpdate, (DWORD_PTR)this);
 
 		GetListCtrl().UnlockWindowUpdate();
 	}

@@ -32,6 +32,8 @@ public:
 	virtual void LoadCustomState();
 	virtual void SaveCustomState();
 
+	CFont * GetDefaultFont();
+	HBRUSH GetDefaultBackground();
 	CString GetMyTempPath(void);
 	CString GetMyTempFilePrefix(void);
 

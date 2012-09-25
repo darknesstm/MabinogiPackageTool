@@ -231,7 +231,14 @@ void CMabinogiPackageToolApp::SaveCustomState()
 }
 
 // CMabinogiPackageToolApp 消息处理程序
-
+CFont * CMabinogiPackageToolApp::GetDefaultFont()
+{
+	return &afxGlobalData.fontRegular;
+}
+HBRUSH CMabinogiPackageToolApp::GetDefaultBackground()
+{
+	return afxGlobalData.brBtnFace;
+}
 
 CString CMabinogiPackageToolApp::GetMyTempPath(void)
 {
@@ -277,6 +284,81 @@ void RecursiveFindFile(CString& strPath, vector<CString> &collector)
 	}
 }
 
+UINT lambda_OnFileMakePackFile(CProgressMonitor *pMonitor, LPVOID pParam)
+{
+	CMakePackFilePage *pPage = (CMakePackFilePage*) pParam;
+			
+	pMonitor->BeginTask(TEXT("制作pack文件：") + pPage->m_strOutputFile, -1);
+
+	// 先查找出所有的文件
+	vector<CString> filePaths;
+	RecursiveFindFile(pPage->m_strInputFolder, filePaths);
+	int prefixLength = lstrlen(pPage->m_strInputFolder);
+
+	PPACKOUTPUT output = pack_output(pPage->m_strOutputFile, pPage->m_ulVersion);
+
+	for(auto iter = filePaths.begin();iter != filePaths.end();++iter)
+	{
+		CString& filePath = *iter;
+	//for (CString& filePath : filePaths)
+	//{
+		pMonitor->SubTask(filePath);
+
+		USES_CONVERSION;
+
+		if (pMonitor->IsCanceled())
+		{
+			break;
+		}
+		s_pack_entry entry;
+		CFile file(filePath, CFile::modeRead);
+		CFileStatus fs;
+		file.GetStatus(fs);
+
+		SYSTEMTIME  st;  
+		FILETIME  ft;
+
+		fs.m_mtime.GetAsSystemTime(st); 
+		::SystemTimeToFileTime(&st,  &ft);
+		memcpy(&entry.ft[0], &ft, sizeof(FILETIME));
+		memcpy(&entry.ft[1], &ft, sizeof(FILETIME));
+
+		fs.m_ctime.GetAsSystemTime(st); 
+		::SystemTimeToFileTime(&st,  &ft); 
+		memcpy(&entry.ft[2], &ft, sizeof(FILETIME));
+		memcpy(&entry.ft[3], &ft, sizeof(FILETIME));
+
+		fs.m_atime.GetAsSystemTime(st); 
+		::SystemTimeToFileTime(&st,  &ft); 
+		memcpy(&entry.ft[4], &ft, sizeof(FILETIME));
+
+		// 将全路径转换为相对路径
+		LPCTSTR lpszRelativePath = ((LPCTSTR)filePath) + prefixLength + 1;
+		lstrcpyA( entry.name, CT2A(lpszRelativePath));
+
+				
+		// 写入文件内容，其实可以使用内存文件映射提高效率
+		char *buffer = new char[fs.m_size];
+		file.Read(buffer, fs.m_size);
+		pack_output_put_next_entry(output, &entry);
+		pack_output_write(output, (byte*)buffer, fs.m_size);
+		pack_output_close_entry(output);
+		free(buffer);
+		file.Close();
+	}
+
+	if (pMonitor->IsCanceled())
+	{
+		pack_output_drop(output);
+	}
+	else
+	{
+		pack_output_close(output);
+	}
+
+	return 0;
+}
+
 void CMabinogiPackageToolApp::OnFileMakePackFile()
 {
 	CMakePackFilePage page;
@@ -291,77 +373,79 @@ void CMabinogiPackageToolApp::OnFileMakePackFile()
 	sheet.SetActivePage(&page);
 	if (sheet.DoModal() ==  ID_WIZFINISH)
 	{
-		CProgressDialog dlg(GetMainWnd()->GetSafeHwnd(), [](CProgressMonitor *pMonitor, LPVOID pParam) -> UINT
-		{
-			CMakePackFilePage *pPage = (CMakePackFilePage*) pParam;
-			
-			pMonitor->BeginTask(TEXT("制作pack文件：") + pPage->m_strOutputFile, -1);
+		//CProgressDialog dlg(GetMainWnd()->GetSafeHwnd(), [](CProgressMonitor *pMonitor, LPVOID pParam) -> UINT
+		//{
+		//	CMakePackFilePage *pPage = (CMakePackFilePage*) pParam;
+		//	
+		//	pMonitor->BeginTask(TEXT("制作pack文件：") + pPage->m_strOutputFile, -1);
 
-			// 先查找出所有的文件
-			vector<CString> filePaths;
-			RecursiveFindFile(pPage->m_strInputFolder, filePaths);
-			int prefixLength = lstrlen(pPage->m_strInputFolder);
+		//	// 先查找出所有的文件
+		//	vector<CString> filePaths;
+		//	RecursiveFindFile(pPage->m_strInputFolder, filePaths);
+		//	int prefixLength = lstrlen(pPage->m_strInputFolder);
 
-			PPACKOUTPUT output = pack_output(pPage->m_strOutputFile, pPage->m_ulVersion);
-			for (CString& filePath : filePaths)
-			{
-				pMonitor->SubTask(filePath);
+		//	PPACKOUTPUT output = pack_output(pPage->m_strOutputFile, pPage->m_ulVersion);
 
-				USES_CONVERSION;
 
-				if (pMonitor->IsCanceled())
-				{
-					break;
-				}
-				s_pack_entry entry;
-				CFile file(filePath, CFile::modeRead);
-				CFileStatus fs;
-				file.GetStatus(fs);
+		//	for (CString& filePath : filePaths)
+		//	{
+		//		pMonitor->SubTask(filePath);
 
-				SYSTEMTIME  st;  
-				FILETIME  ft;
+		//		USES_CONVERSION;
 
-				fs.m_mtime.GetAsSystemTime(st); 
-				::SystemTimeToFileTime(&st,  &ft);
-				memcpy(&entry.ft[0], &ft, sizeof(FILETIME));
-				memcpy(&entry.ft[1], &ft, sizeof(FILETIME));
+		//		if (pMonitor->IsCanceled())
+		//		{
+		//			break;
+		//		}
+		//		s_pack_entry entry;
+		//		CFile file(filePath, CFile::modeRead);
+		//		CFileStatus fs;
+		//		file.GetStatus(fs);
 
-				fs.m_ctime.GetAsSystemTime(st); 
-				::SystemTimeToFileTime(&st,  &ft); 
-				memcpy(&entry.ft[2], &ft, sizeof(FILETIME));
-				memcpy(&entry.ft[3], &ft, sizeof(FILETIME));
+		//		SYSTEMTIME  st;  
+		//		FILETIME  ft;
 
-				fs.m_atime.GetAsSystemTime(st); 
-				::SystemTimeToFileTime(&st,  &ft); 
-				memcpy(&entry.ft[4], &ft, sizeof(FILETIME));
+		//		fs.m_mtime.GetAsSystemTime(st); 
+		//		::SystemTimeToFileTime(&st,  &ft);
+		//		memcpy(&entry.ft[0], &ft, sizeof(FILETIME));
+		//		memcpy(&entry.ft[1], &ft, sizeof(FILETIME));
 
-				// 将全路径转换为相对路径
-				LPCTSTR lpszRelativePath = ((LPCTSTR)filePath) + prefixLength + 1;
-				lstrcpyA( entry.name, CT2A(lpszRelativePath));
+		//		fs.m_ctime.GetAsSystemTime(st); 
+		//		::SystemTimeToFileTime(&st,  &ft); 
+		//		memcpy(&entry.ft[2], &ft, sizeof(FILETIME));
+		//		memcpy(&entry.ft[3], &ft, sizeof(FILETIME));
 
-				
-				// 写入文件内容，其实可以使用内存文件映射提高效率
-				char *buffer = new char[fs.m_size];
-				file.Read(buffer, fs.m_size);
-				pack_output_put_next_entry(output, &entry);
-				pack_output_write(output, (byte*)buffer, fs.m_size);
-				pack_output_close_entry(output);
-				free(buffer);
-				file.Close();
-			}
+		//		fs.m_atime.GetAsSystemTime(st); 
+		//		::SystemTimeToFileTime(&st,  &ft); 
+		//		memcpy(&entry.ft[4], &ft, sizeof(FILETIME));
 
-			if (pMonitor->IsCanceled())
-			{
-				pack_output_drop(output);
-			}
-			else
-			{
-				pack_output_close(output);
-			}
+		//		// 将全路径转换为相对路径
+		//		LPCTSTR lpszRelativePath = ((LPCTSTR)filePath) + prefixLength + 1;
+		//		lstrcpyA( entry.name, CT2A(lpszRelativePath));
 
-			return 0;
-		}, &page, true);
+		//		
+		//		// 写入文件内容，其实可以使用内存文件映射提高效率
+		//		char *buffer = new char[fs.m_size];
+		//		file.Read(buffer, fs.m_size);
+		//		pack_output_put_next_entry(output, &entry);
+		//		pack_output_write(output, (byte*)buffer, fs.m_size);
+		//		pack_output_close_entry(output);
+		//		free(buffer);
+		//		file.Close();
+		//	}
 
+		//	if (pMonitor->IsCanceled())
+		//	{
+		//		pack_output_drop(output);
+		//	}
+		//	else
+		//	{
+		//		pack_output_close(output);
+		//	}
+
+		//	return 0;
+		//}, &page, true);
+		CProgressDialog dlg(GetMainWnd()->GetSafeHwnd(), lambda_OnFileMakePackFile,  &page, true);
 		dlg.DoModal();
 	}
 

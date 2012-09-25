@@ -51,7 +51,7 @@ public:
 
 	afx_msg void OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnEditExtractTo();
-private:
+
 	void ExtractTo(CPackFolder *pFolder, CString strPath, CProgressMonitor *pMonitor);
 };
 

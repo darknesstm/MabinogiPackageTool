@@ -103,7 +103,8 @@ END_MESSAGE_MAP()
 
 BOOL CMakePackFilePage::OnSetActive()
 {
-	GetParentSheet()->SetWizardButtons(PSWIZB_FINISH);
+	//GetParentSheet()->SetWizardButtons(PSWIZB_FINISH);
+	((CPropertySheet*)GetParent())->SetWizardButtons(PSWIZB_FINISH);
 	return CPropertyPage::OnSetActive();
 }
 
