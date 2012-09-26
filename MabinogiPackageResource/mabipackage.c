@@ -143,6 +143,8 @@ PPACKINPUT pack_input(LPCTSTR file_name)
 		return 0;
 	}
 
+	//input->seed = header.
+
 	// ¼ÓÔØµ½ÄÚ´æ
 	p_list_buffer = malloc(list_header.list_header_size);
 	tmp = fread(p_list_buffer, list_header.list_header_size, 1, input->_file);

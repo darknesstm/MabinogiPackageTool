@@ -169,4 +169,7 @@ public:
 	virtual void DeleteContents();
 private:
 	void Parse(void);
+public:
+	virtual BOOL OnOpenDocument(LPCTSTR lpszPathName);
+	virtual void SetTitle(LPCTSTR lpszTitle);
 };

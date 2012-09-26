@@ -222,3 +222,23 @@ void CMabinogiPackageToolDoc::Parse(void)
 		m_pSelectedFolder = m_spRoot.get();
 	}
 }
+
+
+BOOL CMabinogiPackageToolDoc::OnOpenDocument(LPCTSTR lpszPathName)
+{
+	if (!CDocument::OnOpenDocument(lpszPathName))
+		return FALSE;
+
+	return TRUE;
+}
+
+
+void CMabinogiPackageToolDoc::SetTitle(LPCTSTR lpszTitle)
+{
+	if (m_pPackInput)
+	{
+		//CString strTitle;
+		//strTitle.Format(TEXT("%s<%d>"), lpszTitle, );
+	}
+	CDocument::SetTitle(lpszTitle);
+}

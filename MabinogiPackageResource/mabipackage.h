@@ -19,6 +19,8 @@ typedef struct _s_pack_entry {
 } s_pack_entry, *PPACKENTRY;
 
 typedef struct _s_pack_input_stream {
+	//unsigned long seed;
+
 	size_t _pos;	// 当前处理的entry index
 	byte *_ptr;		// 当前读取的字节指针
 	byte *_buffer;	// 当前entry解压出来的数据

@@ -88,13 +88,15 @@ void CMabinogiPackageToolView::OnInitialUpdate()
 
 	GetListCtrl().SetExtendedStyle(GetListCtrl().GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
 
-	GetListCtrl().InsertColumn(0, TEXT("文件名"), 0 , 100);
-	GetListCtrl().InsertColumn(1, TEXT("类型"), 0 , 100);
-	GetListCtrl().InsertColumn(2, TEXT("大小"), 0 , 100);
-	GetListCtrl().InsertColumn(3, TEXT("压缩后大小"), 0 , 100);
-	GetListCtrl().InsertColumn(4, TEXT("创建日期"), 0 , 100);
-	GetListCtrl().InsertColumn(5, TEXT("最后写入日期"), 0 , 100);
-	GetListCtrl().InsertColumn(6, TEXT("最后访问日期"), 0 , 100);
+	int index = 0;
+	GetListCtrl().InsertColumn(index++, TEXT("文件名"), 0 , 150);
+	GetListCtrl().InsertColumn(index++, TEXT("版本"), 0 , 100);
+	GetListCtrl().InsertColumn(index++, TEXT("类型"), 0 , 100);
+	GetListCtrl().InsertColumn(index++, TEXT("大小"), 0 , 100);
+	GetListCtrl().InsertColumn(index++, TEXT("压缩后大小"), 0 , 100);
+	GetListCtrl().InsertColumn(index++, TEXT("创建日期"), 0 , 100);
+	GetListCtrl().InsertColumn(index++, TEXT("最后写入日期"), 0 , 100);
+	GetListCtrl().InsertColumn(index++, TEXT("最后访问日期"), 0 , 100);
 }
 
 void CMabinogiPackageToolView::OnRButtonUp(UINT /* nFlags */, CPoint point)
@@ -167,18 +169,29 @@ void CMabinogiPackageToolView::OnUpdate(CView* pSender, LPARAM /*lHint*/, CObjec
 					SHGFI_TYPENAME|SHGFI_USEFILEATTRIBUTES|SHGFI_SYSICONINDEX );
 				
 				int nItem = GetListCtrl().InsertItem(0, spFile->m_strName, shFilefo.iIcon);
-				GetListCtrl().SetItemText(nItem, 1, shFilefo.szTypeName);
+				int index = 1;
 
 				
+
+				TCHAR szBuffer[20];
+#ifdef _UNICODE
+				_itow_s(spFile->GetEntry()->seed, szBuffer, 20, 10);
+#else
+				_itoa_s(spFile->GetEntry()->seed, szBuffer, 20, 10);
+#endif
+				GetListCtrl().SetItemText(nItem, index++, szBuffer);
+
+				GetListCtrl().SetItemText(nItem, index++, shFilefo.szTypeName);
+
 				// 原始大小
-				GetListCtrl().SetItemText(nItem, 2, GetFileSizeText(spFile->GetEntry()->decompress_size));
+				GetListCtrl().SetItemText(nItem, index++, GetFileSizeText(spFile->GetEntry()->decompress_size));
 				
 				// 压缩后大小
-				GetListCtrl().SetItemText(nItem, 3, GetFileSizeText(spFile->GetEntry()->compress_size));
+				GetListCtrl().SetItemText(nItem, index++, GetFileSizeText(spFile->GetEntry()->compress_size));
 
-				GetListCtrl().SetItemText(nItem, 4, GetFileTimeText(& spFile->GetEntry()->ft[2]));
-				GetListCtrl().SetItemText(nItem, 5, GetFileTimeText(& spFile->GetEntry()->ft[0]));
-				GetListCtrl().SetItemText(nItem, 6, GetFileTimeText(& spFile->GetEntry()->ft[4]));
+				GetListCtrl().SetItemText(nItem, index++, GetFileTimeText(& spFile->GetEntry()->ft[2]));
+				GetListCtrl().SetItemText(nItem, index++, GetFileTimeText(& spFile->GetEntry()->ft[0]));
+				GetListCtrl().SetItemText(nItem, index++, GetFileTimeText(& spFile->GetEntry()->ft[4]));
 
 				GetListCtrl().SetItemData(nItem, (DWORD_PTR)spFile.get());
 			}
