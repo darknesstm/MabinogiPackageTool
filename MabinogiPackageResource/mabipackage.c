@@ -230,10 +230,10 @@ PPACKOUTPUT pack_output(LPCTSTR file_name, unsigned long version)
 	output->_entries = (PPACKENTRY) calloc(sizeof(s_pack_entry) , output->_entry_malloc_count);
 
 #ifdef _UNICODE
-	output->_file = _wfopen(file_name, L"wb");
+	//output->_file = _wfopen(file_name, L"wb");
 	wcscpy(output->_file_name, file_name);
 #else
-	output->_file = fopen(file_name, "wb");
+	//output->_file = fopen(file_name, "wb");
 	strcpy(output->_file_name, file_name);
 #endif
 
@@ -343,9 +343,18 @@ size_t _put_name_chars(const char * name, char * buffer)
  */
 void pack_output_drop(PPACKOUTPUT output)
 {
-	fclose(output->_file);
-	fclose(output->_tmp_file);
+	if (output->_file)
+	{
+		fclose(output->_file);
+		output->_file = 0;
+	}
 
+	if (output->_tmp_file)
+	{
+		fclose(output->_tmp_file);
+		output->_tmp_file = 0;
+	}
+	
 	if (output->_buffer)
 	{
 		free(output->_buffer);
@@ -378,6 +387,13 @@ void pack_output_close(PPACKOUTPUT output)
 
 	FILETIME ft;
 	SYSTEMTIME st;
+
+	// 到真正需要写入的时候才打开文件，这样中止不会破坏原始文件
+#ifdef _UNICODE
+	output->_file = _wfopen(output->_file_name, L"wb");
+#else
+	output->_file = fopen(output->_file_name, "wb");
+#endif
 
 	memcpy(header.signature, "PACK\002\001\0\0", 8);
 	header.d1 = 1;
