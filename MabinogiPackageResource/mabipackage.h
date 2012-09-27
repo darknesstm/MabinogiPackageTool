@@ -47,6 +47,18 @@ typedef struct _s_pack_output_stram {
 	size_t _entry_malloc_count;	// 已经申请内存的个数
 } s_pack_output_stram, *PPACKOUTPUT;
 
+#define LOG_FATAL		(0)
+#define LOG_ERROR		(LOG_FATAL + 1)
+#define LOG_WARN		(LOG_ERROR + 1)
+#define LOG_INFO		(LOG_WARN + 1)
+#define LOG_DEBUG		(LOG_INFO + 1)
+#define LOG_TRACE		(LOG_DEBUG + 1)
+
+typedef void(CALLBACK *LOGFUNC)(int level, LPCTSTR message);
+
+
+LOGFUNC get_default_log_handle();
+LOGFUNC set_log_handle(LOGFUNC func);
 
 PPACKINPUT pack_input(LPCTSTR file_name);
 PPACKOUTPUT pack_output(LPCTSTR file_name, unsigned long version);

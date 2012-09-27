@@ -63,6 +63,19 @@ typedef struct __s_pack_item_info
 
 #pragma pack()
 ///////////////////////////////////////////////////////////
+LOGFUNC g_log = 0;
+
+
+//void _log(int level, LPCTSTR format, ...) 
+//{
+//	if (g_log)
+//	{
+//		
+//		g_log(level, message);
+//	}
+//}
+
+///////////////////////////////////////////////////////////
 void _encrypt(char * pBuffer, size_t size, size_t seed )
 {
 	// ¼ÓÃÜ
@@ -114,6 +127,7 @@ PPACKINPUT pack_input(LPCTSTR file_name)
 #endif
 	if (input->_file == 0)
 	{
+		
 		fprintf(stderr, "%s(%d)-%s:%s", __FILE__, __LINE__ , __FUNCTION__, "open file error.");
 		pack_input_close(input);
 		return 0;
@@ -606,8 +620,24 @@ void pack_output_close_entry(PPACKOUTPUT output)
 	free(buffer);
 }
 
+void CALLBACK default_log_func(int level, LPCTSTR message)
+{
+#ifdef _UNICODE
+	fwprintf_s(stderr, L"%s", message);
+#else
+	fprintf_s(stderr, "%s", message);
+#endif
+}
 
+LOGFUNC get_default_log_handle()
+{
+	return default_log_func;
+}
 
+LOGFUNC set_log_handle(LOGFUNC func)
+{
+	g_log = func;
+}
 #ifdef __cplusplus
 }
 #endif
