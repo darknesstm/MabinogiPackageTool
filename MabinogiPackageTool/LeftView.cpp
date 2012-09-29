@@ -198,24 +198,34 @@ void CLeftView::OnEditExtractTo()
 	HTREEITEM hItem = GetTreeCtrl().GetSelectedItem();
 	if (hItem != nullptr)
 	{
-		CFolderPickerDialog dlg(0, 0, this);
-		if (dlg.DoModal() == IDOK)
+		CString strOutput;
+		if (theApp.GetShellManager()->BrowseForFolder(strOutput, this, 0, TEXT("选择一个解压文件夹"), 
+			BIF_RETURNONLYFSDIRS|BIF_EDITBOX|BIF_NEWDIALOGSTYLE|BIF_USENEWUI))
 		{
-			//static CString path;
-			//static CPackFolder *pFolder;
-
-			path = dlg.GetPathName();
+			path = strOutput;
 			pFolder = (CPackFolder*) GetTreeCtrl().GetItemData(hItem);
-			//CProgressDialog dlg(theApp.GetMainWnd()->GetSafeHwnd(), [](CProgressMonitor *pMonitor, LPVOID pParam) -> UINT
-			//{
-			//	pMonitor->BeginTask(TEXT("解压到：") + path, -1);
-			//	CLeftView *pLeftView = (CLeftView*) pParam;
-			//	pLeftView->ExtractTo(pFolder, path + TEXT("\\") + pFolder->m_strName, pMonitor);
-			//	return 0;
-			//}, this, true);
 			CProgressDialog dlg(theApp.GetMainWnd()->GetSafeHwnd(), _lambda_OnEditExtractTo, this, true);
 			dlg.DoModal();
 		}
+		
+		// CFolderPickerDialog 似乎在win2003下有bug
+		//CFolderPickerDialog dlg(0, 0, this);
+		//if (dlg.DoModal() == IDOK)
+		//{
+		//	//static CString path;
+		//	//static CPackFolder *pFolder;
+
+		//	
+		//	//CProgressDialog dlg(theApp.GetMainWnd()->GetSafeHwnd(), [](CProgressMonitor *pMonitor, LPVOID pParam) -> UINT
+		//	//{
+		//	//	pMonitor->BeginTask(TEXT("解压到：") + path, -1);
+		//	//	CLeftView *pLeftView = (CLeftView*) pParam;
+		//	//	pLeftView->ExtractTo(pFolder, path + TEXT("\\") + pFolder->m_strName, pMonitor);
+		//	//	return 0;
+		//	//}, this, true);
+		//	CProgressDialog dlg(theApp.GetMainWnd()->GetSafeHwnd(), _lambda_OnEditExtractTo, this, true);
+		//	dlg.DoModal();
+		//}
 	}
 }
 

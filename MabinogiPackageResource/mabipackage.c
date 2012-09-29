@@ -636,7 +636,9 @@ LOGFUNC get_default_log_handle()
 
 LOGFUNC set_log_handle(LOGFUNC func)
 {
+	LOGFUNC old = g_log;
 	g_log = func;
+	return g_log;
 }
 #ifdef __cplusplus
 }
