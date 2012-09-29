@@ -111,10 +111,11 @@ BOOL CMakePackFilePage::OnSetActive()
 
 void CMakePackFilePage::OnClickedBrowserInput()
 {
-	CFolderPickerDialog dlg(TEXT("选择打包文件夹"), 0, this);
-	if (dlg.DoModal() == IDOK)
+	CString strOutput;
+	if (theApp.GetShellManager()->BrowseForFolder(strOutput, this, 0, TEXT("选择打包文件夹"), 
+		BIF_RETURNONLYFSDIRS|BIF_EDITBOX|BIF_NEWDIALOGSTYLE|BIF_USENEWUI) != FALSE)
 	{
-		m_strInputFolder = dlg.GetPathName();
+		m_strInputFolder = strOutput;
 		UpdateData(FALSE);
 	}
 }
