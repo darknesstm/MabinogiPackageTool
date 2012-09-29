@@ -224,36 +224,39 @@ void CMabinogiPackageToolView::OnUpdate(CView* pSender, LPARAM /*lHint*/, CObjec
 void CMabinogiPackageToolView::OnLvnItemchanged(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
-	if ( (pNMLV->uNewState & LVIS_SELECTED) == LVIS_SELECTED)
+	if (GetListCtrl().GetSelectedCount() == 1)
 	{
-		CMainFrame *pFrame = reinterpret_cast<CMainFrame*>(theApp.GetMainWnd());
-		CPreviewPane &previewPane = pFrame->GetPreviewPane();
-		if (previewPane.IsVisible())
+		// 只有在选中一个的时候更新预览内容
+		if ( (pNMLV->uNewState & LVIS_SELECTED) == LVIS_SELECTED)
 		{
-			CPackEntry *pEntry = (CPackEntry*)GetListCtrl().GetItemData(pNMLV->iItem);
-
-			if (pEntry->IsTextContent())
+			CMainFrame *pFrame = reinterpret_cast<CMainFrame*>(theApp.GetMainWnd());
+			CPreviewPane &previewPane = pFrame->GetPreviewPane();
+			if (previewPane.IsVisible())
 			{
-				shared_ptr<vector<byte> > spData = pEntry->GetData();
-				spData->push_back(0);
-				spData->push_back(0);
+				CPackEntry *pEntry = (CPackEntry*)GetListCtrl().GetItemData(pNMLV->iItem);
 
-				if (IsTextUnicode(&*spData->begin(), spData->size() - 2, NULL))
+				if (pEntry->IsTextContent())
 				{
-					USES_CONVERSION;
-					CString temp =  CW2CT((LPCWSTR)&*spData->begin()) ;
-					previewPane.SetTextContent(temp);
-				}
-				else
-				{
-					USES_CONVERSION;
-					CString temp =  CA2CT((LPCSTR)&*spData->begin()) ;
-					previewPane.SetTextContent(temp);
+					shared_ptr<vector<byte> > spData = pEntry->GetData();
+					spData->push_back(0);
+					spData->push_back(0);
+
+					if (IsTextUnicode(&*spData->begin(), spData->size() - 2, NULL))
+					{
+						USES_CONVERSION;
+						CString temp =  CW2CT((LPCWSTR)&*spData->begin()) ;
+						previewPane.SetTextContent(temp);
+					}
+					else
+					{
+						USES_CONVERSION;
+						CString temp =  CA2CT((LPCSTR)&*spData->begin()) ;
+						previewPane.SetTextContent(temp);
+					}
 				}
 			}
 		}
 	}
-
 
 	*pResult = 0;
 }
@@ -362,13 +365,35 @@ void CMabinogiPackageToolView::OnEditExtractTo()
 	}
 	else
 	{
-		int nItem = GetListCtrl().GetNextSelectedItem(pos);
-		CPackEntry* pEntry = (CPackEntry*) GetListCtrl().GetItemData(nItem);
+		vector<CPackEntry*> entries;
 
-		CFileDialog dlg(FALSE, NULL, pEntry->m_strName, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, NULL, this);
-		if( dlg.DoModal() == IDOK )
+		while (pos)
 		{
-			pEntry->WriteToFile(dlg.GetPathName());
+			int nItem = GetListCtrl().GetNextSelectedItem(pos);
+			CPackEntry* pEntry = (CPackEntry*) GetListCtrl().GetItemData(nItem);
+			entries.push_back(pEntry);
+		}
+
+		// 这里需要区分单个选中和多个选中
+		if (entries.size() == 1)
+		{
+			CFileDialog dlg(FALSE, NULL, (*entries.begin())->m_strName, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, NULL, this);
+			if( dlg.DoModal() == IDOK )
+			{
+				(*entries.begin())->WriteToFile(dlg.GetPathName());
+			}
+		}
+		else
+		{
+			CString strOutput;
+			if (theApp.GetShellManager()->BrowseForFolder(strOutput, this, 0, TEXT("选择一个解压文件夹"), 
+				BIF_RETURNONLYFSDIRS|BIF_EDITBOX|BIF_NEWDIALOGSTYLE|BIF_USENEWUI) != FALSE)
+			{
+				for (auto iter = entries.begin();iter != entries.end();++iter)
+				{
+					(*iter)->WriteToFile(strOutput + TEXT("\\") + (*iter)->m_strName);
+				}
+			}
 		}
 	}
 	

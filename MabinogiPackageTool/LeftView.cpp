@@ -200,7 +200,7 @@ void CLeftView::OnEditExtractTo()
 	{
 		CString strOutput;
 		if (theApp.GetShellManager()->BrowseForFolder(strOutput, this, 0, TEXT("选择一个解压文件夹"), 
-			BIF_RETURNONLYFSDIRS|BIF_EDITBOX|BIF_NEWDIALOGSTYLE|BIF_USENEWUI))
+			BIF_RETURNONLYFSDIRS|BIF_EDITBOX|BIF_NEWDIALOGSTYLE|BIF_USENEWUI) != FALSE)
 		{
 			path = strOutput;
 			pFolder = (CPackFolder*) GetTreeCtrl().GetItemData(hItem);
