@@ -9,6 +9,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MabinogiPackageTool", "Mabi
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MabinogiPackageTool.WTL", "MabinogiPackageTool.WTL\MabinogiPackageTool.WTL.vcxproj", "{8BD38268-B123-4DBF-9565-4E570296F41A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{73303F7F-D51A-43AF-A309-1723C797B82C} = {73303F7F-D51A-43AF-A309-1723C797B82C}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

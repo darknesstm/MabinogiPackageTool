@@ -3,12 +3,14 @@
 #include "mt.h"
 #include "zlib.h"
 #include <io.h>
+#include <tchar.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #define FILE_READ_BUFFER_COUNT 10240
+#define ERROR_MESSAGE_SIZE 1024
 
 #pragma pack(1)
 
@@ -62,18 +64,6 @@ typedef struct __s_pack_item_info
 } _s_pack_item_info;
 
 #pragma pack()
-///////////////////////////////////////////////////////////
-LOGFUNC g_log = 0;
-
-
-//void _log(int level, LPCTSTR format, ...) 
-//{
-//	if (g_log)
-//	{
-//		
-//		g_log(level, message);
-//	}
-//}
 
 ///////////////////////////////////////////////////////////
 void _encrypt(char * pBuffer, size_t size, size_t seed )
@@ -103,7 +93,8 @@ void _decrypt(char * pBuffer, size_t size, size_t seed )
 ///////////////////////////////////////////////////////////
 PPACKINPUT pack_input(LPCTSTR file_name) 
 {
-	// c语言规范，先定义内部变量
+	TCHAR err_msg[ERROR_MESSAGE_SIZE] = {0};
+
 	size_t tmp;
 	_s_pack_header header;
 	_s_pack_list_header list_header;
@@ -120,53 +111,44 @@ PPACKINPUT pack_input(LPCTSTR file_name)
 	input->_pos = -1;
 
 	// 打开文件
-#ifdef _UNICODE
-	input->_file = _wfopen(file_name, L"rb");
-#else
-	input->_file = fopen(file_name, "rb");
-#endif
+	input->_file = _tfopen(file_name, TEXT("rb"));
+
 	if (input->_file == 0)
 	{
-		
-		fprintf(stderr, "%s(%d)-%s:%s", __FILE__, __LINE__ , __FUNCTION__, "open file error.");
-		pack_input_close(input);
-		return 0;
+		_stprintf_s(err_msg, ERROR_MESSAGE_SIZE, TEXT("无法打开文件：%s - %s(%d)"), file_name, TEXT(__FILE__), __LINE__ );
+		goto error_handle;
 	}
 
 	tmp = fread(&header, sizeof(header), 1, input->_file);
 	if (tmp != 1)
 	{
-		fprintf(stderr, "%s(%d)-%s:%s", __FILE__, __LINE__ , __FUNCTION__, "read header error.");
-		pack_input_close(input);
-		return 0;
+		_stprintf_s(err_msg, ERROR_MESSAGE_SIZE, TEXT("读取文件头失败：%s - %s(%d)"), file_name, TEXT(__FILE__), __LINE__);
+		goto error_handle;
 	}
 
 	// 检查文件头
 	if (memcmp(header.signature, "PACK", 4) != 0)
 	{
-		fprintf(stderr, "%s(%d)-%s:%s", __FILE__, __LINE__ , __FUNCTION__, "header signature error.");
-		pack_input_close(input);
-		return 0;
+		_stprintf_s(err_msg, ERROR_MESSAGE_SIZE, TEXT("PACK文件头签名不正确：%s - %s(%d)"), file_name, TEXT(__FILE__), __LINE__);
+		goto error_handle;
 	}
 
 	tmp = fread(&list_header, sizeof(list_header), 1, input->_file);
 	if (tmp != 1)
 	{
-		fprintf(stderr, "%s(%d)-%s:%s", __FILE__, __LINE__ , __FUNCTION__, "read list header error.");
-		pack_input_close(input);
-		return 0;
+		_stprintf_s(err_msg, ERROR_MESSAGE_SIZE, TEXT("PACK文件头签名不正确：%s - %s(%d)"), file_name, TEXT(__FILE__), __LINE__);
+		goto error_handle;
 	}
 
-	//input->seed = header.
+	input->seed = header.d1;
 
 	// 加载到内存
 	p_list_buffer = malloc(list_header.list_header_size);
 	tmp = fread(p_list_buffer, list_header.list_header_size, 1, input->_file);
 	if (tmp != 1)
 	{
-		fprintf(stderr, "%s(%d)-%s:%s", __FILE__, __LINE__ , __FUNCTION__, "read list content error.");
-		pack_input_close(input);
-		return 0;
+		_stprintf_s(err_msg, ERROR_MESSAGE_SIZE, TEXT("读取列表内容错误：%s - %s(%d)"), file_name, TEXT(__FILE__), __LINE__);
+		goto error_handle;
 	}
 
 	p_tmp = (char *) p_list_buffer;
@@ -222,6 +204,11 @@ PPACKINPUT pack_input(LPCTSTR file_name)
 	free(p_list_buffer);
 
 	return input;
+
+error_handle:
+	pack_log(LOG_ERROR, err_msg);
+	pack_input_close(input);
+	return 0;
 }
 
 // 每次扩容一倍
@@ -234,6 +221,8 @@ void _grow_entry_array(PPACKOUTPUT output)
 
 PPACKOUTPUT pack_output(LPCTSTR file_name, unsigned long version) 
 {
+	TCHAR err_msg[ERROR_MESSAGE_SIZE] = {0};
+
 	size_t i = 0;
 	// 这里申请的内存应该在关闭输出的时候被释放
 	PPACKOUTPUT output = (PPACKOUTPUT) calloc(sizeof(s_pack_output_stram), 1);
@@ -245,37 +234,27 @@ PPACKOUTPUT pack_output(LPCTSTR file_name, unsigned long version)
 	// 这里申请的内存应该在关闭输出的时候被释放
 	output->_entries = (PPACKENTRY) calloc(sizeof(s_pack_entry) , output->_entry_malloc_count);
 
-#ifdef _UNICODE
-	//output->_file = _wfopen(file_name, L"wb");
-	wcscpy(output->_file_name, file_name);
-#else
-	//output->_file = fopen(file_name, "wb");
-	strcpy(output->_file_name, file_name);
-#endif
+	_tccpy(output->_file_name, file_name);
 
-	// TODO 文件打开错误检测
-
-#ifdef _UNICODE
 	do
 	{
-		swprintf(output->_tmp_file_name, MAX_PATH, L"%s.tmp%d", file_name, i);
+		_stprintf_s(output->_tmp_file_name, MAX_PATH, TEXT("%s.tmp%d"), file_name, i);
 		i++;
 	} 
-	while (_waccess(output->_tmp_file_name, 0) == 0);
-	output->_tmp_file = _wfopen(output->_tmp_file_name, L"w+b");
-#else
-	do
-	{
-		printf(output->_tmp_file_name, "%s.tmp%d", file_name, i);
-		i++;
-	} 
-	while (access(output->_tmp_file_name, 0) == 0);
-	output->_tmp_file = fopen(output->_tmp_file_name, "w+b");
-#endif
-	// TODO 文件打开错误检测
+	while (_taccess(output->_tmp_file_name, 0) == 0);
+	output->_tmp_file = _tfopen(output->_tmp_file_name, TEXT("w+b"));
 
+	if (output->_tmp_file == 0)
+	{
+		_stprintf_s(err_msg, ERROR_MESSAGE_SIZE, TEXT("无法打开临时文件：%s - %s(%d)"), output->_tmp_file_name, TEXT(__FILE__), __LINE__ );
+		goto error_handle;
+	}
 
 	return output;
+error_handle:
+	pack_log(LOG_ERROR, err_msg);
+	pack_output_drop(output);
+	return 0;
 }
 
 void pack_input_close(PPACKINPUT input)
@@ -383,15 +362,13 @@ void pack_output_drop(PPACKOUTPUT output)
 		output->_entries = 0;
 	}
 	// 删除临时文件
-#ifdef _UNICODE
-	_wremove(output->_tmp_file_name);
-#else
-	remove(output->_tmp_file_name);
-#endif
+	_tremove(output->_tmp_file_name);
 }
 
 void pack_output_close(PPACKOUTPUT output)
 {
+	TCHAR err_msg[ERROR_MESSAGE_SIZE] = {0};
+
 	// 写入文件，如果预留的空间足够大，则直接使用临时文件
 	_s_pack_header header = {0};
 	_s_pack_list_header list_header = {0};
@@ -405,11 +382,12 @@ void pack_output_close(PPACKOUTPUT output)
 	SYSTEMTIME st;
 
 	// 到真正需要写入的时候才打开文件，这样中止不会破坏原始文件
-#ifdef _UNICODE
-	output->_file = _wfopen(output->_file_name, L"wb");
-#else
-	output->_file = fopen(output->_file_name, "wb");
-#endif
+	output->_file = _tfopen(output->_file_name, TEXT("wb"));
+	if (output->_file == 0)
+	{
+		_stprintf_s(err_msg, ERROR_MESSAGE_SIZE, TEXT("无法打开文件：%s - %s(%d)"), output->_file_name, TEXT(__FILE__), __LINE__ );
+		goto error_handle;
+	}
 
 	memcpy(header.signature, "PACK\002\001\0\0", 8);
 	header.d1 = 1;
@@ -481,11 +459,14 @@ void pack_output_close(PPACKOUTPUT output)
 		output->_entries = 0;
 	}
 	// 删除临时文件
-#ifdef _UNICODE
-	_wremove(output->_tmp_file_name);
-#else
-	remove(output->_tmp_file_name);
-#endif
+	_tremove(output->_tmp_file_name);
+	
+	return;
+
+error_handle:
+	pack_log(LOG_ERROR, err_msg);
+
+	return;
 }
 
 void pack_inpu_reset(PPACKINPUT input)
@@ -618,27 +599,6 @@ void pack_output_close_entry(PPACKOUTPUT output)
 	free(output->_buffer);
 	output->_buffer = 0;
 	free(buffer);
-}
-
-void CALLBACK default_log_func(int level, LPCTSTR message)
-{
-#ifdef _UNICODE
-	fwprintf_s(stderr, L"%s", message);
-#else
-	fprintf_s(stderr, "%s", message);
-#endif
-}
-
-LOGFUNC get_default_log_handle()
-{
-	return default_log_func;
-}
-
-LOGFUNC set_log_handle(LOGFUNC func)
-{
-	LOGFUNC old = g_log;
-	g_log = func;
-	return g_log;
 }
 #ifdef __cplusplus
 }
