@@ -4,6 +4,7 @@
 #include "zlib.h"
 #include <io.h>
 #include <tchar.h>
+#include "log.h"
 
 #ifdef __cplusplus
 extern "C" {

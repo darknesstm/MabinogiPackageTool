@@ -336,15 +336,24 @@ UINT lambda_OnFileMakePackFile(CProgressMonitor *pMonitor, LPVOID pParam)
 		LPCTSTR lpszRelativePath = ((LPCTSTR)filePath) + prefixLength + 1;
 		lstrcpyA( entry.name, CT2A(lpszRelativePath));
 
-				
+#pragma warning( push )
+#pragma warning( disable : 4244 ) // 禁止类型转换丢失的警告
 		// 写入文件内容，其实可以使用内存文件映射提高效率
-		char *buffer = new char[fs.m_size];
-		file.Read(buffer, fs.m_size);
-		pack_output_put_next_entry(output, &entry);
-		pack_output_write(output, (byte*)buffer, fs.m_size);
-		pack_output_close_entry(output);
-		free(buffer);
-		file.Close();
+		// pack文件的格式基础上无法加入单个大于4G的文件
+		if (fs.m_size < (1024i64 * 1024 * 1024 * 4))
+		{
+			char *buffer = new char[fs.m_size];
+			file.Read(buffer, fs.m_size);
+			file.Close();
+
+			pack_output_put_next_entry(output, &entry);
+			pack_output_write(output, (byte*)buffer, fs.m_size);
+			pack_output_close_entry(output);
+			delete[] buffer;
+		} else {
+			// 警告信息
+		}
+#pragma warning( pop )
 	}
 
 	if (pMonitor->IsCanceled())

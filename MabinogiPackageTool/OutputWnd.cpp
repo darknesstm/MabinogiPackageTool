@@ -5,6 +5,8 @@
 #include "Resource.h"
 #include "MainFrm.h"
 
+#include "../MabinogiPackageResource/log.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -58,6 +60,9 @@ int COutputWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	// 将列表窗口附加到选项卡:
 	m_wndTabs.AddTab(&m_wndOutputLog, TEXT("日志"), (UINT)0);
+
+	// 显示日志
+	//pack_add_log_handle();
 
 	return 0;
 }
@@ -144,6 +149,7 @@ void COutputList::OnEditCopy()
 void COutputList::OnEditClear()
 {
 	//MessageBox(_T("清除输出"));
+
 }
 
 void COutputList::OnViewOutput()
