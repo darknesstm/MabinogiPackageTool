@@ -13,6 +13,9 @@
       <UniqueIdentifier>{2b813891-175f-45ac-b2a9-c4393c679352}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;jpg;jpeg;jpe;manifest</Extensions>
     </Filter>
+    <Filter Include="Header Files\wtl">
+      <UniqueIdentifier>{55781958-7e3d-4283-a247-0a2cd10705c7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -46,6 +49,72 @@
     </ClInclude>
     <ClInclude Include="MabinogiPackageToolView.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl\Include\atlapp.h">
+      <Filter>Header Files\wtl</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl\Include\atlcrack.h">
+      <Filter>Header Files\wtl</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl\Include\atlctrls.h">
+      <Filter>Header Files\wtl</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl\Include\atlctrlw.h">
+      <Filter>Header Files\wtl</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl\Include\atlctrlx.h">
+      <Filter>Header Files\wtl</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl\Include\atlddx.h">
+      <Filter>Header Files\wtl</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl\Include\atldlgs.h">
+      <Filter>Header Files\wtl</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl\Include\atldwm.h">
+      <Filter>Header Files\wtl</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl\Include\atlfind.h">
+      <Filter>Header Files\wtl</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl\Include\atlframe.h">
+      <Filter>Header Files\wtl</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl\Include\atlgdi.h">
+      <Filter>Header Files\wtl</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl\Include\atlmisc.h">
+      <Filter>Header Files\wtl</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl\Include\atlprint.h">
+      <Filter>Header Files\wtl</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl\Include\atlres.h">
+      <Filter>Header Files\wtl</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl\Include\atlresce.h">
+      <Filter>Header Files\wtl</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl\Include\atlribbon.h">
+      <Filter>Header Files\wtl</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl\Include\atlscrl.h">
+      <Filter>Header Files\wtl</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl\Include\atlsplit.h">
+      <Filter>Header Files\wtl</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl\Include\atltheme.h">
+      <Filter>Header Files\wtl</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl\Include\atluser.h">
+      <Filter>Header Files\wtl</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl\Include\atlwince.h">
+      <Filter>Header Files\wtl</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl\Include\atlwinx.h">
+      <Filter>Header Files\wtl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

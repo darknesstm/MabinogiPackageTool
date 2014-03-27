@@ -17,13 +17,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v110_xp</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v110_xp</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -40,13 +40,13 @@
     <IntDir>Debug\</IntDir>
     <OutDir>Debug\</OutDir>
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(WTL_HOME)\include;$(IncludePath)</IncludePath>
+    <IncludePath>wtl\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IntDir>Release\</IntDir>
     <OutDir>Release\</OutDir>
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(WTL_HOME)\include;$(IncludePath)</IncludePath>
+    <IncludePath>wtl\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -127,6 +127,28 @@
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="wtl\Include\atlapp.h" />
+    <ClInclude Include="wtl\Include\atlcrack.h" />
+    <ClInclude Include="wtl\Include\atlctrls.h" />
+    <ClInclude Include="wtl\Include\atlctrlw.h" />
+    <ClInclude Include="wtl\Include\atlctrlx.h" />
+    <ClInclude Include="wtl\Include\atlddx.h" />
+    <ClInclude Include="wtl\Include\atldlgs.h" />
+    <ClInclude Include="wtl\Include\atldwm.h" />
+    <ClInclude Include="wtl\Include\atlfind.h" />
+    <ClInclude Include="wtl\Include\atlframe.h" />
+    <ClInclude Include="wtl\Include\atlgdi.h" />
+    <ClInclude Include="wtl\Include\atlmisc.h" />
+    <ClInclude Include="wtl\Include\atlprint.h" />
+    <ClInclude Include="wtl\Include\atlres.h" />
+    <ClInclude Include="wtl\Include\atlresce.h" />
+    <ClInclude Include="wtl\Include\atlribbon.h" />
+    <ClInclude Include="wtl\Include\atlscrl.h" />
+    <ClInclude Include="wtl\Include\atlsplit.h" />
+    <ClInclude Include="wtl\Include\atltheme.h" />
+    <ClInclude Include="wtl\Include\atluser.h" />
+    <ClInclude Include="wtl\Include\atlwince.h" />
+    <ClInclude Include="wtl\Include\atlwinx.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MabinogiPackageTool.WTL.rc" />
