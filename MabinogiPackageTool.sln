@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MabinogiPackageResource", "MabinogiPackageResource\MabinogiPackageResource.vcxproj", "{73303F7F-D51A-43AF-A309-1723C797B82C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MabinogiPackageTool", "MabinogiPackageTool\MabinogiPackageTool.vcxproj", "{B0BEDEC9-FC58-4521-AEA3-BE3DB1401E79}"
@@ -12,6 +14,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MabinogiPackageTool.WTL", "
 	ProjectSection(ProjectDependencies) = postProject
 		{73303F7F-D51A-43AF-A309-1723C797B82C} = {73303F7F-D51A-43AF-A309-1723C797B82C}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MabinogiPackageTool.Htmlayout", "MabinogiPackageTool.Htmlayout\MabinogiPackageTool.Htmlayout.vcxproj", "{E4B397A4-224B-4B91-B3BC-AC1ADDB4B9EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +42,12 @@ Global
 		{8BD38268-B123-4DBF-9565-4E570296F41A}.Dynamic Release|Win32.Build.0 = Release|Win32
 		{8BD38268-B123-4DBF-9565-4E570296F41A}.Release|Win32.ActiveCfg = Release|Win32
 		{8BD38268-B123-4DBF-9565-4E570296F41A}.Release|Win32.Build.0 = Release|Win32
+		{E4B397A4-224B-4B91-B3BC-AC1ADDB4B9EF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E4B397A4-224B-4B91-B3BC-AC1ADDB4B9EF}.Debug|Win32.Build.0 = Debug|Win32
+		{E4B397A4-224B-4B91-B3BC-AC1ADDB4B9EF}.Dynamic Release|Win32.ActiveCfg = Release|Win32
+		{E4B397A4-224B-4B91-B3BC-AC1ADDB4B9EF}.Dynamic Release|Win32.Build.0 = Release|Win32
+		{E4B397A4-224B-4B91-B3BC-AC1ADDB4B9EF}.Release|Win32.ActiveCfg = Release|Win32
+		{E4B397A4-224B-4B91-B3BC-AC1ADDB4B9EF}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
