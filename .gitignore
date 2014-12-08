@@ -31,3 +31,4 @@ $tf*/
 *.opensdf
 *.sdf
 ipch/
+.vs/

@@ -404,7 +404,7 @@ void pack_output_close(PPACKOUTPUT output)
 	fwrite(&header, sizeof(_s_pack_header), 1, output->_file);
 
 	// 先要跳过list header，直接写入文件列表
-	fseek(output->_file, sizeof(_s_pack_header) + sizeof(_s_pack_list_header), SEEK_SET);
+	_fseeki64(output->_file, sizeof(_s_pack_header) + sizeof(_s_pack_list_header), SEEK_SET);
 	for (i = 0; i < header.sum; i++)
 	{
 		p_entry = &output->_entries[i];
@@ -430,12 +430,12 @@ void pack_output_close(PPACKOUTPUT output)
 	// 写入 list header
 	list_header.sum = header.sum;
 
-	fseek(output->_file, sizeof(_s_pack_header), SEEK_SET);
+	_fseeki64(output->_file, sizeof(_s_pack_header), SEEK_SET);
 	fwrite(&list_header, sizeof(_s_pack_list_header), 1, output->_file);
 
 	// 将临时文件的内容追加进去
-	fseek(output->_file, sizeof(_s_pack_header) + sizeof(_s_pack_list_header) + list_header.list_header_size, SEEK_SET);
-	fseek(output->_tmp_file, 0, SEEK_SET);
+	_fseeki64(output->_file, sizeof(_s_pack_header) + sizeof(_s_pack_list_header) + list_header.list_header_size, SEEK_SET);
+	_fseeki64(output->_tmp_file, 0, SEEK_SET);
 
 	// 准备缓存区
 	buffer = (char *) malloc(FILE_READ_BUFFER_COUNT);
@@ -496,10 +496,10 @@ PPACKENTRY pack_input_read_for_entry(PPACKINPUT input, size_t index)
 	// 这里申请的内存在下面被释放
 	p_buffer = (char *) malloc(p_entry->compress_size);
 	// 从文件读取
-	fseek(input->_file, p_entry->offset, SEEK_SET);
+	_fseeki64(input->_file, p_entry->offset, SEEK_SET);
 	fread(p_buffer, p_entry->compress_size, 1, input->_file);
 	_decrypt(p_buffer, p_entry->compress_size, p_entry->seed);
-	
+
 	// 准备好缓冲区
 	if (input->_buffer)
 	{
