@@ -235,7 +235,7 @@ PPACKOUTPUT pack_output(LPCTSTR file_name, unsigned long version)
 	// 这里申请的内存应该在关闭输出的时候被释放
 	output->_entries = (PPACKENTRY) calloc(sizeof(s_pack_entry) , output->_entry_malloc_count);
 
-	_tccpy(output->_file_name, file_name);
+	_tcscpy(output->_file_name, file_name);
 
 	do
 	{
